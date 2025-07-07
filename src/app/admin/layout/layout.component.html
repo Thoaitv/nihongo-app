@@ -1,0 +1,250 @@
+<nz-layout class="admin-layout">
+    <!-- Sidebar -->
+    <nz-sider class="admin-layout__sidebar" nzCollapsible [(nzCollapsed)]="isCollapsed" [nzWidth]="280"
+        [nzCollapsedWidth]="70" nzBreakpoint="lg" (nzCollapsedChange)="isCollapsed = $event" [nzTrigger]="null">
+
+        <!-- Logo Section -->
+        <div class="admin-layout__logo">
+            <div class="admin-layout__logo-wrapper" [class.collapsed]="isCollapsed">
+                <div class="admin-layout__logo-icon">
+                    <i class="fas fa-torii-gate"></i>
+                </div>
+                <div class="admin-layout__logo-text" *ngIf="!isCollapsed">
+                    <h3 class="admin-layout__logo-title">Japanese</h3>
+                    <span class="admin-layout__logo-subtitle">Learning Platform</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed" class="admin-layout__menu">
+
+            <ng-container *ngFor="let item of menuItems">
+                <!-- Menu Item without children -->
+                <li *ngIf="!item.children" nz-menu-item [nzDisabled]="item.disabled"
+                    [nzSelected]="selectedKeys.includes(item.key)" (click)="onMenuClick(item)"
+                    class="admin-layout__menu-item">
+
+                    <span class="admin-layout__menu-icon mr-3">
+                        <i [class]="item.icon"></i>
+                    </span>
+                    <span class="admin-layout__menu-title">{{ item.title }}</span>
+
+                    <nz-badge *ngIf="item.badge && item.badge > 0" [nzCount]="item.badge" [nzOffset]="[8, 0]"
+                        nzSize="small" class="admin-layout__menu-badge">
+                    </nz-badge>
+                </li>
+
+                <!-- Submenu with children -->
+                <li *ngIf="item.children" nz-submenu [nzOpen]="openKeys.includes(item.key)"
+                    class="admin-layout__submenu">
+
+                    <span title class="admin-layout__submenu-title">
+                        <span class="admin-layout__menu-icon">
+                            <i [class]="item.icon"></i>
+                        </span>
+                        <span class="admin-layout__menu-title">{{ item.title }}</span>
+                    </span>
+
+                    <ul class="admin-layout__submenu-list">
+                        <li *ngFor="let child of item.children" nz-menu-item [nzDisabled]="child.disabled"
+                            [nzSelected]="selectedKeys.includes(child.key)" (click)="onMenuClick(child)"
+                            class="admin-layout__submenu-item" style="padding-left: 0;">
+
+                            <span class="admin-layout__submenu-icon mr-2">
+                                <i [class]="child.icon"></i>
+                            </span>
+                            <span class="admin-layout__submenu-text">{{ child.title }}</span>
+
+                            <nz-badge *ngIf="child.badge && child.badge > 0" [nzCount]="child.badge" [nzOffset]="[4, 0]"
+                                nzSize="small" class="admin-layout__submenu-badge">
+                            </nz-badge>
+                        </li>
+                    </ul>
+                </li>
+            </ng-container>
+        </ul>
+
+        <!-- Sidebar Footer -->
+        <div class="admin-layout__sidebar-footer" *ngIf="!isCollapsed">
+            <div class="admin-layout__sidebar-stats">
+                <div class="admin-layout__stat-item">
+                    <i class="fas fa-users"></i>
+                    <div class="admin-layout__stat-content">
+                        <span class="admin-layout__stat-number">1,250</span>
+                        <span class="admin-layout__stat-label">Học viên</span>
+                    </div>
+                </div>
+                <div class="admin-layout__stat-item">
+                    <i class="fas fa-book"></i>
+                    <div class="admin-layout__stat-content">
+                        <span class="admin-layout__stat-number">45</span>
+                        <span class="admin-layout__stat-label">Bài học</span>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-layout__sidebar-time">
+                <div class="admin-layout__time-item">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ currentTime | date:'HH:mm' }}</span>
+                </div>
+                <div class="admin-layout__time-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>{{ currentTime | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+        </div>
+    </nz-sider>
+
+    <!-- Main Content -->
+    <nz-layout class="admin-layout__main" [style.margin-left.px]="isCollapsed ? 70 : 280">
+
+        <!-- Header -->
+        <nz-header class="admin-layout__header">
+            <div class="admin-layout__header-content">
+
+                <!-- Header Left -->
+                <div class="admin-layout__header-left">
+                    <button nz-button nzType="text" nzSize="large" (click)="toggleCollapsed()"
+                        class="admin-layout__toggle-btn" nz-tooltip="Thu gọn/Mở rộng menu">
+                        <i class="fas" [class.fa-indent]="isCollapsed" [class.fa-outdent]="!isCollapsed"></i>
+                    </button>
+
+                    <nz-breadcrumb class="admin-layout__breadcrumb">
+                        <nz-breadcrumb-item *ngFor="let item of breadcrumbItems; let last = last">
+                            <a *ngIf="item.url && !last" [routerLink]="item.url" class="admin-layout__breadcrumb-link">
+                                {{ item.label }}
+                            </a>
+                            <span *ngIf="!item.url || last" class="admin-layout__breadcrumb-current">
+                                {{ item.label }}
+                            </span>
+                        </nz-breadcrumb-item>
+                    </nz-breadcrumb>
+                </div>
+
+                <!-- Header Right -->
+                <div class="admin-layout__header-right">
+                    <nz-space nzSize="large">
+
+                        <!-- Search -->
+                        <!-- <div *nzSpaceItem class="admin-layout__search">
+              <nz-input-group nzPrefixIcon="search" nzSize="default">
+                <input 
+                  type="text" 
+                  nz-input 
+                  placeholder="Tìm kiếm..." 
+                  class="admin-layout__search-input">
+              </nz-input-group>
+            </div> -->
+
+                        <!-- Notifications -->
+                        <button *nzSpaceItem nz-button nzType="text" nzSize="large" class="admin-layout__action-btn"
+                            nz-tooltip="Thông báo">
+                            <nz-badge [nzCount]="5" nzSize="small" nzColor="#ff4d4f">
+                                <i class="fas fa-bell"></i>
+                            </nz-badge>
+                        </button>
+
+                        <!-- Messages -->
+                        <button *nzSpaceItem nz-button nzType="text" nzSize="large" class="admin-layout__action-btn"
+                            nz-tooltip="Tin nhắn">
+                            <nz-badge [nzCount]="3" nzSize="small" nzColor="#1890ff">
+                                <i class="fas fa-envelope"></i>
+                            </nz-badge>
+                        </button>
+
+                        <!-- Language -->
+                        <button *nzSpaceItem nz-button nzType="text" nzSize="large" class="admin-layout__action-btn"
+                            nz-tooltip="Ngôn ngữ">
+                            <i class="fas fa-language"></i>
+                        </button>
+
+                        <!-- Settings -->
+                        <button *nzSpaceItem nz-button nzType="text" nzSize="large" class="admin-layout__action-btn"
+                            nz-tooltip="Cài đặt">
+                            <i class="fas fa-cog"></i>
+                        </button>
+
+                        <!-- User Dropdown -->
+                        <div *nzSpaceItem class="admin-layout__user-dropdown">
+                            <a nz-dropdown nzPlacement="bottomRight" [nzDropdownMenu]="userMenu"
+                                class="admin-layout__user-info">
+
+                                <nz-avatar [nzSrc]="currentUser.avatar" [nzSize]="42" class="admin-layout__user-avatar">
+                                </nz-avatar>
+
+                                <div class="admin-layout__user-details">
+                                    <div class="admin-layout__user-name">{{ currentUser.name }}</div>
+                                    <!-- <div class="admin-layout__user-role">
+                    <nz-tag nzColor="processing">{{ currentUser.role }}</nz-tag>
+                  </div> -->
+                                </div>
+
+                                <i class="fas fa-chevron-down admin-layout__user-arrow"></i>
+                            </a>
+
+                            <nz-dropdown-menu #userMenu="nzDropdownMenu">
+                                <ul nz-menu class="admin-layout__user-menu">
+                                    <li nz-menu-item (click)="goToProfile()">
+                                        <i class="fas fa-user"></i>
+                                        <span>Hồ sơ cá nhân</span>
+                                    </li>
+                                    <li nz-menu-item (click)="goToSettings()">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Cài đặt tài khoản</span>
+                                    </li>
+                                    <li nz-menu-item>
+                                        <i class="fas fa-moon"></i>
+                                        <span>Chế độ tối</span>
+                                    </li>
+                                    <li nz-menu-divider></li>
+                                    <li nz-menu-item (click)="logout()" class="admin-layout__logout-item">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Đăng xuất</span>
+                                    </li>
+                                </ul>
+                            </nz-dropdown-menu>
+                        </div>
+                    </nz-space>
+                </div>
+            </div>
+        </nz-header>
+
+        <!-- Content -->
+        <nz-content class="admin-layout__content">
+            <div class="admin-layout__content-wrapper">
+                <router-outlet></router-outlet>
+            </div>
+        </nz-content>
+
+        <!-- Footer -->
+        <nz-footer class="admin-layout__footer">
+            <div class="admin-layout__footer-content">
+                <div class="admin-layout__footer-left">
+                    <span>© 2025 Japanese Learning Platform.
+                    </span>
+                </div>
+                <div class="admin-layout__footer-right">
+                    <nz-space nzSize="large">
+                        <a *nzSpaceItem href="#" target="_blank" class="admin-layout__footer-link">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Hỗ trợ</span>
+                        </a>
+                        <a *nzSpaceItem href="#" target="_blank" class="admin-layout__footer-link">
+                            <i class="fas fa-file-contract"></i>
+                            <span>Điều khoản</span>
+                        </a>
+                        <a *nzSpaceItem href="#" target="_blank" class="admin-layout__footer-link">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Bảo mật</span>
+                        </a>
+                        <a *nzSpaceItem href="#" target="_blank" class="admin-layout__footer-link">
+                            <i class="fas fa-code"></i>
+                            <span>API</span>
+                        </a>
+                    </nz-space>
+                </div>
+            </div>
+        </nz-footer>
+    </nz-layout>
+</nz-layout>

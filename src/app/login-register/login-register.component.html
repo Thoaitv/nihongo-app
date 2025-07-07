@@ -1,0 +1,88 @@
+<!-- login-register.component.html -->
+<div class="auth-container">
+  <div class="form-card">
+    <nz-tabset [(nzSelectedIndex)]="selectedTab" (nzSelectedIndexChange)="onTabChange($event)">
+      <nz-tab nzTitle="Đăng nhập">
+        <form (ngSubmit)="onLoginSubmit()" [formGroup]="loginForm">
+          <h2 class="title">Đăng nhập</h2>
+
+          <button class="btn-google" type="button">
+            <i class="fab fa-google"></i> Đăng nhập với Google
+          </button>
+
+          <div class="divider">
+            <span>hoặc</span>
+          </div>
+
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="text" id="loginEmail" class="form-control" placeholder="Nhập email của bạn"
+              formControlName="email" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Mật khẩu</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="Nhập mật khẩu"
+              formControlName="password" required>
+          </div>
+
+          <div class="options">
+            <label><input type="checkbox"> Ghi nhớ đăng nhập</label>
+            <a href="#" class="forgot">Quên mật khẩu?</a>
+          </div>
+
+          <!-- <button nz-button [nzType]="'primary'" [disabled]="loginForm.invalid" class="btn-submit">Đăng nhập</button> -->
+          <button nz-button [nzType]="'primary'" class="btn-submit">Đăng nhập</button>
+
+          <div class="switch">
+            Chưa có tài khoản? <a (click)="selectedTab = 1">Đăng ký ngay</a>
+          </div>
+        </form>
+      </nz-tab>
+      <nz-tab nzTitle="Đăng ký">
+        <form (ngSubmit)="onRegisterSubmit()" [formGroup]="registerForm">
+          <h2 class="title">Đăng ký tài khoản</h2>
+
+          <button class="btn-google" type="button">
+            <i class="fab fa-google"></i> Đăng ký với Google
+          </button>
+
+          <div class="divider">
+            <span>hoặc</span>
+          </div>
+
+          <div class="form-group">
+            <label for="registerName">Họ và tên</label>
+            <input type="text" id="registerName" class="form-control" placeholder="Nhập họ và tên"
+              formControlName="name" required>
+          </div>
+          <div class="form-group">
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" class="form-control" placeholder="Nhập email của bạn"
+              formControlName="email" required>
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Mật khẩu</label>
+            <input type="password" id="registerPassword" class="form-control"
+              placeholder="Tạo mật khẩu (ít nhất 8 ký tự)" formControlName="password" required>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Xác nhận mật khẩu</label>
+            <input type="password" id="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" required>
+          </div>
+
+          <div class="form-check pl-0">
+            <label><input type="checkbox"> Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách
+                bảo mật</a></label>
+          </div>
+
+          <button nz-button [nzType]="'primary'" [disabled]="registerForm.invalid" class="btn-submit">Tạo tài
+            khoản</button>
+
+          <div class="switch">
+            Đã có tài khoản? <a (click)="selectedTab = 0">Đăng nhập</a>
+          </div>
+        </form>
+      </nz-tab>
+    </nz-tabset>
+  </div>
+</div>
