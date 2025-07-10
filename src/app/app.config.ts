@@ -14,6 +14,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import * as AllIcons from '@ant-design/icons-angular/icons';
+import { NZ_I18N, vi_VN } from 'ng-zorro-antd/i18n';
 
 import { IconDefinition } from '@ant-design/icons-angular';
 const antDesignIcons = AllIcons as {
@@ -32,5 +33,6 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideNzIcons(icons),
     provideNzI18n(en_US),
+    { provide: NZ_I18N, useValue: vi_VN },
   ],
 };

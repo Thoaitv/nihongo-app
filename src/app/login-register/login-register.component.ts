@@ -9,6 +9,9 @@ import {
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { Router } from '@angular/router';
+import { ApiService } from '../services/api.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login-register',
@@ -23,17 +26,30 @@ export class LoginRegisterComponent {
   loginForm: FormGroup;
   registerForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private apiService: ApiService,
+    private message: NzMessageService,
+    private toastr: ToastrService
+  ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required]],
     });
 
-    this.registerForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
+    this.registerForm = this.fb.group(
+      {
+        name: [''],
+        email: ['', ],
+        username: [''],
+        password: [''],
+        confirmPassword: [''],
+      },
+      {
+        validators: this.passwordMatchValidator,
+      }
+    );
   }
 
   onTabChange(index: number): void {
@@ -41,27 +57,49 @@ export class LoginRegisterComponent {
   }
 
   onLoginSubmit(): void {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
+    localStorage.clear();
+    const { username, password } = this.loginForm.value;
+    this.apiService.login({ username, password }).subscribe({
+      next: (res: any) => {
+        if (res.status) {
+          console.log('username', username);
 
-      // 🧪 Bạn có thể kiểm tra điều kiện đăng nhập tại đây
-      if (email === 'a') {
-        this.router.navigate(['/admin/tu-vung']);
-      } else {
-        this.router.navigate(['/home']);
-      }
-
-      // Hoặc sau này bạn sẽ call API và xử lý kết quả thành công rồi navigate:
-      // this.authService.login(email, password).subscribe(user => {
-      //   this.router.navigate(['/home']);
-      // });
-    }
+          this.toastr.success('Đăng nhập thành công');
+          if (username === 'admin') {
+            this.router.navigate(['/admin/topics']);
+          } else {
+            this.router.navigate(['/student/home']);
+          }
+          localStorage.setItem('role', res?.data.role);
+          localStorage.setItem('username', res?.data.username);
+        } else {
+          this.toastr.error('Đăng nhập thất bại');
+        }
+      },
+      error: (err) => {
+        console.error('Đăng nhập thất bại:', err);
+      },
+    });
   }
 
-  onRegisterSubmit(): void {
-    if (this.registerForm.valid) {
-      console.log('Đăng ký dữ liệu:', this.registerForm.value);
-      // TODO: call auth API register
-    }
+  onRegisterSubmit() {
+    const { name, email, username, password } = this.registerForm.value;
+
+    this.apiService.register({ name, email, username, password }).subscribe({
+      next: (res) => {
+        this.toastr.success('Đăng ký thành công!');
+        this.selectedTab = 0;
+        this.registerForm.reset();
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'Đăng ký thất bại!';
+        this.toastr.error(msg);
+      },
+    });
+  }
+  passwordMatchValidator(form: FormGroup) {
+    const password = form.get('password')?.value;
+    const confirmPassword = form.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { mismatch: true };
   }
 }

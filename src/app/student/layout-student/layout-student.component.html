@@ -1,0 +1,59 @@
+<header class="header">
+    <nav class="nav-container">
+        <a href="#" class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-torii-gate"></i>
+            </div>
+            <span>NihonGo Master</span>
+        </a>
+
+        <ul class="nav-menu">
+            <li><a href="./index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="./part2.html" class="nav-link">Học tập</a></li>
+            <li><a href="./part2.html" class="nav-link">Từ vựng</a></li>
+            <li><a href="./part3.html" class="nav-link">Tiến độ</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <button class="language-toggle" onclick="toggleLanguage()">
+                <span id="current-lang">VI</span> ⇄ <span class="japanese-text">日本語</span>
+            </button>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon" id="theme-icon"></i>
+            </button>
+
+            <a href="auth" class="login-btn" (click)="showAuth()" *ngIf="role !== 'USER'">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Đăng nhập</span>
+            </a>
+
+            <!-- Nếu đã đăng nhập (USER role) -->
+            <a nz-dropdown *ngIf="role === 'USER'" [nzDropdownMenu]="userMenu">
+                <a class="user-btn" nz-dropdown>
+                    <i class="fas fa-user-circle"></i>
+                    <span>{{userName}}</span>
+                    <i nz-icon nzType="down"></i>
+                </a>
+            </a>
+
+            <nz-dropdown-menu #userMenu="nzDropdownMenu">
+                <ul nz-menu>
+                    <li nz-menu-item (click)="goToProfile()">
+                        <i class="fas fa-id-badge"></i>
+                        Trang cá nhân
+                    </li>
+                    <li nz-menu-item (click)="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Đăng xuất
+                    </li>
+                </ul>
+            </nz-dropdown-menu>
+
+        </div>
+    </nav>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <router-outlet></router-outlet>
+</main>

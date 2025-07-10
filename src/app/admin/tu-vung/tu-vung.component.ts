@@ -1,33 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, NavigationEnd } from '@angular/router';
-import { NzLayoutModule } from 'ng-zorro-antd/layout';
-import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
-import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { filter } from 'rxjs/operators';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { ApiService } from '../../services/api.service';
 
-interface MenuItemData {
-  key: string;
-  title: string;
-  icon: string;
-  route?: string;
-  children?: MenuItemData[];
-  badge?: number;
-  disabled?: boolean;
-}
-
-interface BreadcrumbItem {
-  label: string;
-  url?: string;
+interface Topic {
+  id: number;
+  name: string;
+  description: string;
+  level: 'N5' | 'N4' | 'N3' | 'N2' | 'N1';
+  status: 'active' | 'inactive';
+  lessonsCount: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 @Component({
@@ -35,308 +39,153 @@ interface BreadcrumbItem {
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
-    NzLayoutModule,
-    NzMenuModule,
-    NzIconModule,
-    NzAvatarModule,
-    NzDropDownModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NzTableModule,
     NzButtonModule,
-    NzBreadCrumbModule,
-    NzToolTipModule,
-    NzBadgeModule,
-    NzDividerModule,
-    NzSpaceModule,
+    NzModalModule,
+    NzFormModule,
+    NzInputModule,
+    NzMessageModule,
+    NzPopconfirmModule,
     NzTagModule,
+    NzSpaceModule,
+    NzCardModule,
+    NzDividerModule,
+    NzSelectModule,
+    NzIconModule,
+    NzToolTipModule,
   ],
   templateUrl: './tu-vung.component.html',
   styleUrls: ['./tu-vung.component.scss'],
 })
 export class TuVungComponent implements OnInit {
-  isCollapsed = false;
-  selectedKeys: string[] = [];
-  openKeys: string[] = [];
-  breadcrumbItems: BreadcrumbItem[] = [];
-  currentTime = new Date();
-  currentUser = {
-    name: 'Admin User',
-    email: 'admin@japanlearning.com',
-    avatar: 'https://joeschmoe.io/api/v1/random',
-    role: 'Administrator',
-  };
+  constructor() {}
+  vocabForm!: FormGroup;
+  isModalVisible = false;
+  isLoading = false;
+  modalTitle = 'Thêm từ vựng mới';
+  searchValue = '';
 
-  menuItems: MenuItemData[] = [
-    {
-      key: 'dashboard',
-      title: 'Tổng quan',
-      icon: 'fas fa-tachometer-alt',
-      route: '/admin/dashboard',
-    },
-    {
-      key: 'content-management',
-      title: 'Quản lý nội dung',
-      icon: 'fas fa-book',
-      children: [
-        {
-          key: 'topics',
-          title: 'Chủ đề',
-          icon: 'fas fa-tags',
-          route: '/admin/topics',
-          badge: 4,
-        },
-        {
-          key: 'lessons',
-          title: 'Bài học',
-          icon: 'fas fa-file-alt',
-          route: '/admin/lessons',
-          badge: 12,
-        },
-        {
-          key: 'vocabulary',
-          title: 'Từ vựng',
-          icon: 'fas fa-language',
-          route: '/admin/vocabulary',
-          badge: 256,
-        },
-        {
-          key: 'grammar',
-          title: 'Ngữ pháp',
-          icon: 'fas fa-spell-check',
-          route: '/admin/grammar',
-          badge: 45,
-        },
-        {
-          key: 'kanji',
-          title: 'Kanji',
-          icon: 'fas fa-chinese',
-          route: '/admin/kanji',
-          badge: 89,
-        },
-      ],
-    },
-    {
-      key: 'user-management',
-      title: 'Quản lý người dùng',
-      icon: 'fas fa-users',
-      children: [
-        {
-          key: 'students',
-          title: 'Học viên',
-          icon: 'fas fa-user-graduate',
-          route: '/admin/students',
-          badge: 1250,
-        },
-        {
-          key: 'teachers',
-          title: 'Giáo viên',
-          icon: 'fas fa-chalkboard-teacher',
-          route: '/admin/teachers',
-          badge: 15,
-        },
-        {
-          key: 'admins',
-          title: 'Quản trị viên',
-          icon: 'fas fa-user-shield',
-          route: '/admin/admins',
-          badge: 3,
-        },
-      ],
-    },
-    {
-      key: 'test-management',
-      title: 'Quản lý bài kiểm tra',
-      icon: 'fas fa-clipboard-check',
-      children: [
-        {
-          key: 'tests',
-          title: 'Bài kiểm tra',
-          icon: 'fas fa-file-text',
-          route: '/admin/tests',
-          badge: 25,
-        },
-        {
-          key: 'questions',
-          title: 'Câu hỏi',
-          icon: 'fas fa-question-circle',
-          route: '/admin/questions',
-          badge: 340,
-        },
-        {
-          key: 'results',
-          title: 'Kết quả',
-          icon: 'fas fa-chart-line',
-          route: '/admin/results',
-        },
-      ],
-    },
-    {
-      key: 'progress-tracking',
-      title: 'Theo dõi tiến độ',
-      icon: 'fas fa-chart-bar',
-      children: [
-        {
-          key: 'student-progress',
-          title: 'Tiến độ học viên',
-          icon: 'fas fa-user-clock',
-          route: '/admin/student-progress',
-        },
-        {
-          key: 'learning-analytics',
-          title: 'Phân tích học tập',
-          icon: 'fas fa-analytics',
-          route: '/admin/learning-analytics',
-        },
-        {
-          key: 'completion-rates',
-          title: 'Tỷ lệ hoàn thành',
-          icon: 'fas fa-percentage',
-          route: '/admin/completion-rates',
-        },
-      ],
-    },
-   
- 
-    {
-      key: 'system',
-      title: 'Hệ thống',
-      icon: 'fas fa-cogs',
-      children: [
-        {
-          key: 'settings',
-          title: 'Cài đặt',
-          icon: 'fas fa-sliders-h',
-          route: '/admin/settings',
-        },
-        {
-          key: 'backup',
-          title: 'Sao lưu',
-          icon: 'fas fa-database',
-          route: '/admin/backup',
-        },
-        {
-          key: 'logs',
-          title: 'Nhật ký',
-          icon: 'fas fa-file-alt',
-          route: '/admin/logs',
-        },
-        {
-          key: 'maintenance',
-          title: 'Bảo trì',
-          icon: 'fas fa-tools',
-          route: '/admin/maintenance',
-        },
-      ],
-    },
-  ];
+  vocabularies: any[] = [];
+  topics: any[] = [];
+  totalItems = 0;
+  pageIndex = 1;
+  pageSize = 10;
 
-  constructor(private router: Router) {}
+  fileToUpload: File | null = null;
+  fileError = false;
+
+  private fb = inject(FormBuilder);
+  private apiService = inject(ApiService);
+  private message = inject(NzMessageService);
 
   ngOnInit(): void {
-    setInterval(() => {
-      this.currentTime = new Date();
-    }, 60000);
-
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.updateSelectedKeys(event.url);
-        this.updateBreadcrumb(event.url);
-      });
-
-    this.updateSelectedKeys(this.router.url);
-    this.updateBreadcrumb(this.router.url);
+    this.initForm();
+    this.loadVocabularies();
+    this.loadTopics();
   }
 
-  toggleCollapsed(): void {
-    this.isCollapsed = !this.isCollapsed;
+  initForm(): void {
+    this.vocabForm = this.fb.group({
+      japaneseWord: ['', Validators.required],
+      romaji: ['', Validators.required],
+      exampleSentence: ['', Validators.required],
+      description: [''], // ✅ mới thêm
+      linkAudio: [''], // ✅ mới thêm
+      topicId: [null, Validators.required],
+    });
   }
 
-  onMenuClick(item: MenuItemData): void {
-    if (item.route) {
-      this.router.navigate([item.route]);
+  loadVocabularies(): void {
+    this.isLoading = true;
+    this.apiService.listVocabularies(this.pageIndex, this.pageSize).subscribe({
+      next: (res: any) => {
+        this.vocabularies = res.data?.list || [];
+        this.totalItems = res.data?.num || 0;
+      },
+      error: (err) => {
+        this.message.error('Lỗi khi tải danh sách từ vựng.');
+      },
+      complete: () => {
+        this.isLoading = false;
+      },
+    });
+  }
+
+  loadTopics(): void {
+    this.apiService.listTopics().subscribe({
+      next: (res: any) => {
+        this.topics = res.data?.list || [];
+      },
+      error: () => {
+        this.message.error('Lỗi khi tải danh sách chủ đề.');
+      },
+    });
+  }
+
+  onPageChange(page: number): void {
+    this.pageIndex = page;
+    this.loadVocabularies();
+  }
+
+  onSearch(): void {
+    // Optionally implement search logic here
+  }
+
+  showAddModal(): void {
+    this.modalTitle = 'Thêm từ vựng mới';
+    this.vocabForm.reset();
+    this.fileToUpload = null;
+    this.fileError = false;
+    this.isModalVisible = true;
+  }
+
+  handleCancel(): void {
+    this.isModalVisible = false;
+    this.vocabForm.reset();
+    this.fileToUpload = null;
+    this.fileError = false;
+  }
+
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.fileToUpload = input.files[0];
+      this.fileError = false;
     }
   }
 
-  onOpenChange(openKeys: string[]): void {
-    this.openKeys = openKeys;
-  }
-
-  private updateSelectedKeys(url: string): void {
-    const pathSegments = url.split('/').filter((segment) => segment);
-    if (pathSegments.length >= 2) {
-      const key = pathSegments[pathSegments.length - 1];
-      this.selectedKeys = [key];
-      this.findAndOpenParentMenu(key);
+  handleSubmit(): void {
+    if (this.vocabForm.invalid || !this.fileToUpload) {
+      if (!this.fileToUpload) this.fileError = true;
+      this.vocabForm.markAllAsTouched();
+      return;
     }
-  }
 
-  private findAndOpenParentMenu(childKey: string): void {
-    for (const item of this.menuItems) {
-      if (item.children) {
-        const childItem = item.children.find((child) => child.key === childKey);
-        if (childItem) {
-          if (!this.openKeys.includes(item.key)) {
-            this.openKeys = [...this.openKeys, item.key];
-          }
-          break;
-        }
-      }
-    }
-  }
+    this.isLoading = true;
 
-  private updateBreadcrumb(url: string): void {
-    const pathSegments = url.split('/').filter((segment) => segment);
-    this.breadcrumbItems = [];
-    if (pathSegments.length >= 1) {
-      this.breadcrumbItems.push({ label: 'Admin', url: '/admin' });
-      const currentKey = pathSegments[pathSegments.length - 1];
-      const menuItem = this.findMenuItemByKey(currentKey);
-      if (menuItem) {
-        const parentItem = this.findParentMenuByChildKey(currentKey);
-        if (parentItem) {
-          this.breadcrumbItems.push({ label: parentItem.title });
-        }
-        this.breadcrumbItems.push({ label: menuItem.title });
-      }
-    }
-  }
+    const formData = new FormData();
+    formData.append('japaneseWord', this.vocabForm.value.japaneseWord);
+    formData.append('romaji', this.vocabForm.value.romaji);
+    formData.append('exampleSentence ', this.vocabForm.value.exampleSentence);
+    formData.append('topicId', this.vocabForm.value.topicId);
+    formData.append('description', this.vocabForm.value.description); // ✅ thêm
+    formData.append('linkAudio', this.vocabForm.value.linkAudio); // ✅ thêm
+    formData.append('file', this.fileToUpload!);
 
-  private findMenuItemByKey(key: string): MenuItemData | null {
-    for (const item of this.menuItems) {
-      if (item.key === key) {
-        return item;
-      }
-      if (item.children) {
-        const childItem = item.children.find((child) => child.key === key);
-        if (childItem) {
-          return childItem;
-        }
-      }
-    }
-    return null;
-  }
-
-  private findParentMenuByChildKey(childKey: string): MenuItemData | null {
-    for (const item of this.menuItems) {
-      if (item.children) {
-        const childItem = item.children.find((child) => child.key === childKey);
-        if (childItem) {
-          return item;
-        }
-      }
-    }
-    return null;
-  }
-
-  logout(): void {
-    this.router.navigate(['/login']);
-  }
-
-  goToProfile(): void {
-    this.router.navigate(['/admin/profile']);
-  }
-
-  goToSettings(): void {
-    this.router.navigate(['/admin/settings']);
+    this.apiService.createVocabulary(formData).subscribe({
+      next: () => {
+        this.message.success('Thêm từ vựng thành công!');
+        this.loadVocabularies();
+        this.handleCancel();
+      },
+      error: () => {
+        this.message.error('Thêm từ vựng thất bại!');
+      },
+      complete: () => {
+        this.isLoading = false;
+      },
+    });
   }
 }

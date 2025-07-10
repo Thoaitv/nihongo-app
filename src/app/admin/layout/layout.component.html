@@ -167,24 +167,18 @@
 
                         <!-- User Dropdown -->
                         <div *nzSpaceItem class="admin-layout__user-dropdown">
-                            <a nz-dropdown nzPlacement="bottomRight" [nzDropdownMenu]="userMenu"
-                                class="admin-layout__user-info">
+                            <a nz-dropdown nzPlacement="bottomRight" [nzDropdownMenu]="userMenu" class="user-btn">
 
-                                <nz-avatar [nzSrc]="currentUser.avatar" [nzSize]="42" class="admin-layout__user-avatar">
+                                <nz-avatar [nzSrc]="currentUser.avatar" [nzSize]="32">
                                 </nz-avatar>
 
-                                <div class="admin-layout__user-details">
-                                    <div class="admin-layout__user-name">{{ currentUser.name }}</div>
-                                    <!-- <div class="admin-layout__user-role">
-                    <nz-tag nzColor="processing">{{ currentUser.role }}</nz-tag>
-                  </div> -->
-                                </div>
+                                    <span>{{ currentUser.name }}</span>
 
-                                <i class="fas fa-chevron-down admin-layout__user-arrow"></i>
+                                <i nz-icon nzType="down"></i>
                             </a>
 
                             <nz-dropdown-menu #userMenu="nzDropdownMenu">
-                                <ul nz-menu class="admin-layout__user-menu">
+                                <ul nz-menu>
                                     <li nz-menu-item (click)="goToProfile()">
                                         <i class="fas fa-user"></i>
                                         <span>Hồ sơ cá nhân</span>
@@ -198,7 +192,7 @@
                                         <span>Chế độ tối</span>
                                     </li>
                                     <li nz-menu-divider></li>
-                                    <li nz-menu-item (click)="logout()" class="admin-layout__logout-item">
+                                    <li nz-menu-item (click)="logout()">
                                         <i class="fas fa-sign-out-alt"></i>
                                         <span>Đăng xuất</span>
                                     </li>

@@ -1,0 +1,103 @@
+<div class="vocabulary-management">
+    <nz-card nzTitle="Quản lý từ vựng" class="vocabulary-management__header-card">
+        <div class="d-flex justify-content-between align-items-center">
+            <nz-input-group nzSuffix>
+                <input type="text" nz-input placeholder="Tìm kiếm từ vựng..." [(ngModel)]="searchValue"
+                    (input)="onSearch()" />
+            </nz-input-group>
+            <button nz-button nzType="primary" (click)="showAddModal()">
+                <i class="fas fa-plus"></i> Thêm từ vựng mới
+            </button>
+        </div>
+    </nz-card>
+
+    <nz-table [nzData]="vocabularies" [nzLoading]="isLoading" [nzPageSize]="pageSize" [nzTotal]="totalItems"
+        [nzPageIndex]="pageIndex" (nzPageIndexChange)="onPageChange($event)" [nzShowSizeChanger]="false"
+        [nzNoResult]="'Không có dữ liệu'" nzBordered>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Từ tiếng Nhật</th>
+                <th>Romaji</th>
+                <th>Ví dụ</th>
+                <th>Mô tả</th> <!-- ✅ mới -->
+                <th>Link Audio</th> <!-- ✅ mới -->
+                <th>Chủ đề</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let vocab of vocabularies; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ vocab.japaneseWord }}</td>
+                <td>{{ vocab.romaji }}</td>
+                <td>{{ vocab.exampleSentence }}</td>
+                <td>{{ vocab.description }}</td> <!-- ✅ mới -->
+                <td>
+                    <audio *ngIf="vocab.linkAudio" [src]="vocab.linkAudio" controls style="width: 120px;"></audio>
+                    <span *ngIf="!vocab.linkAudio">Không có</span>
+                </td>
+                <td>{{ vocab.topicName }}</td>
+            </tr>
+        </tbody>
+    </nz-table>
+
+
+    <nz-modal [(nzVisible)]="isModalVisible" [nzTitle]="modalTitle" [nzClosable]="true" [nzMaskClosable]="false"
+        [nzFooter]="null" (nzOnCancel)="handleCancel()">
+        <ng-container *nzModalContent>
+            <div class="topic-management__modal-content">
+                <form [formGroup]="vocabForm" (ngSubmit)="handleSubmit()" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="japaneseWord" class="form-label">Từ tiếng Nhật</label>
+                        <input nz-input id="japaneseWord" formControlName="japaneseWord"
+                            placeholder="Nhập từ tiếng Nhật...">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="romaji" class="form-label">Romaji</label>
+                        <input nz-input id="romaji" formControlName="romaji" placeholder="Nhập romaji...">
+                    </div>
+                    <!-- ✅ Mô tả -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả</label>
+                        <textarea nz-input id="description" rows="3" formControlName="description"
+                            placeholder="Nhập mô tả từ vựng..."></textarea>
+                    </div>
+                    <!-- ✅ Link audio -->
+                    <div class="mb-3">
+                        <label for="linkAudio" class="form-label">Link Audio</label>
+                        <input nz-input id="linkAudio" formControlName="linkAudio"
+                            placeholder="Nhập đường dẫn audio...">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleSentence" class="form-label">Câu ví dụ</label>
+                        <textarea nz-input id="exampleSentence" rows="3" formControlName="exampleSentence"
+                            placeholder="Nhập ví dụ..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="topicId" class="form-label">Chủ đề</label>
+                        <nz-select formControlName="topicId" nzPlaceHolder="Chọn chủ đề">
+                            <nz-option *ngFor="let option of topics" [nzLabel]="option.name"
+                                [nzValue]="option.id"></nz-option>
+                        </nz-select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file" class="form-label">File</label>
+                        <input type="file" id="file" (change)="onFileChange($event)" class="form-control">
+                        <div *ngIf="fileError" class="text-danger">Vui lòng chọn file</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button nz-button type="button" (click)="handleCancel()">Hủy</button>
+                        <button nz-button nzType="primary" type="submit" [disabled]="isLoading">
+                            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                            <i class="fas fa-save"></i> Thêm mới
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </ng-container>
+    </nz-modal>
+</div>

@@ -6,29 +6,17 @@
       <div class="topic-management__header-content">
         <div class="topic-management__search-section">
           <nz-input-group nzSuffix class="topic-management__search-input">
-            <input 
-              type="text" 
-              nz-input 
-              placeholder="Tìm kiếm chủ đề..." 
-              [(ngModel)]="searchValue"
-              (input)="onSearch()"
-            />
-            <!-- <nz-input-group-slot nzSuffix>
-              <i nz-icon nzType="search"></i>
-            </nz-input-group-slot> -->
+            <input type="text" nz-input placeholder="Tìm kiếm chủ đề..." [(ngModel)]="searchValue"
+              (input)="onSearch()" />
+
           </nz-input-group>
         </div>
-        
+
         <div class="topic-management__actions">
-          <button 
-            nz-button 
-            nzType="primary" 
-            nzSize="default"
-            (click)="showAddModal()"
-            class="topic-management__add-btn"
-          >
+          <button nz-button nzType="primary" nzSize="default" (click)="showAddModal()"
+            class="topic-management__add-btn">
             <i class="fas fa-plus"></i>
-            Thêm chủ đề mới
+            <span class="font-weight-bold">Thêm chủ đề mới</span>
           </button>
         </div>
       </div>
@@ -38,17 +26,10 @@
   <!-- Table Section -->
   <div class="topic-management__table">
     <nz-card class="topic-management__table-card">
-      <nz-table 
-        #basicTable 
-        [nzData]="filteredTopics" 
-        [nzLoading]="isLoading"
-        nzBordered
-        nzSize="middle"
-        [nzPageSize]="10"
-        [nzShowSizeChanger]="true"
-        [nzPageSizeOptions]="[10, 20, 50]"
-        class="topic-management__table-content"
-      >
+      <nz-table #basicTable [nzData]="filteredTopics" [nzLoading]="isLoading" nzBordered nzSize="middle"
+        [nzPageSize]="pageSize" [nzTotal]="totalItems" [nzPageIndex]="pageIndex"
+        (nzPageIndexChange)="onPageChange($event)" [nzShowSizeChanger]="false" class="topic-management__table-content"
+        [nzNoResult]="'Không có dữ liệu'">
         <thead>
           <tr>
             <th nzWidth="50px">#</th>
@@ -57,7 +38,7 @@
             <th nzWidth="80px">Cấp độ</th>
             <th nzWidth="100px">Trạng thái</th>
             <th nzWidth="100px">Số bài học</th>
-            <th nzWidth="120px">Ngày tạo</th>
+            <!-- <th nzWidth="120px">Ngày tạo</th> -->
             <th nzWidth="150px">Thao tác</th>
           </tr>
         </thead>
@@ -66,7 +47,7 @@
             <td>{{ i + 1 }}</td>
             <td>
               <div class="topic-management__topic-name">
-                <i class="fas fa-book-open topic-management__topic-icon"></i>
+                <i class="fas fa-book topic-management__topic-icon"></i>
                 {{ topic.name }}
               </div>
             </td>
@@ -91,40 +72,22 @@
                 {{ topic.lessonsCount }}
               </div>
             </td>
-            <td>
+            <!-- <td>
               <div class="topic-management__date">
-                {{ topic.createdAt | date:'dd/MM/yyyy' }}
+                {{ topic?.createdAt | date:'dd/MM/yyyy' }}
               </div>
-            </td>
+            </td> -->
             <td>
               <nz-space nzSize="small">
-                <button 
-                  *nzSpaceItem
-                  nz-button 
-                  nzType="default" 
-                  nzSize="small"
-                  nzShape="circle"
-                  (click)="showEditModal(topic)"
-                  nz-tooltip="Sửa"
-                  class="topic-management__edit-btn"
-                >
-                  <i class="fas fa-edit"></i>
+                <button *nzSpaceItem nz-button nzType="default" nzSize="small" nzShape="circle"
+                  (click)="showEditModal(topic)" nz-tooltip="Sửa" class="topic-management__edit-btn">
+                  <span nz-icon nzType="edit" nzTheme="outline"></span>
                 </button>
-                <button 
-                  *nzSpaceItem
-                  nz-button 
-                  nzType="primary" 
-                  nzDanger
-                  nzSize="small"
-                  nzShape="circle"
-                  nz-popconfirm
-                  nzPopconfirmTitle="Bạn có chắc chắn muốn xóa chủ đề này?"
-                  nzPopconfirmPlacement="topRight"
-                  (nzOnConfirm)="deleteTopic(topic.id)"
-                  nz-tooltip="Xóa"
-                  class="topic-management__delete-btn"
-                >
-                  <i class="fas fa-trash"></i>
+                <button *nzSpaceItem nz-button nzType="primary" nzDanger nzSize="small" nzShape="circle" nz-popconfirm
+                  nzPopconfirmTitle="Bạn có chắc chắn muốn xóa chủ đề này?" nzPopconfirmPlacement="topRight"
+                  nzOkText="Đồng ý" nzCancelText="Hủy" (nzOnConfirm)="deleteTopic(topic.id)" nz-tooltip="Xóa"
+                  class="topic-management__delete-btn">
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
                 </button>
               </nz-space>
             </td>
@@ -135,133 +98,93 @@
   </div>
 
   <!-- Modal for Add/Edit Topic -->
-  <nz-modal
-    [(nzVisible)]="isModalVisible"
-    [nzTitle]="modalTitle"
-    [nzClosable]="true"
-    [nzMaskClosable]="false"
-    [nzWidth]="600"
-    [nzFooter]="null"
-    (nzOnCancel)="handleCancel()"
-    class="topic-management__modal"
-  >
-    <div class="topic-management__modal-content">
-      <form nz-form [formGroup]="topicForm" (ngSubmit)="handleSubmit()">
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="name">
-            <i class="fas fa-tag"></i>
-            Tên chủ đề
-          </nz-form-label>
-          <nz-form-control 
-            [nzSm]="18" 
-            [nzXs]="24" 
-            nzErrorTip="Vui lòng nhập tên chủ đề (ít nhất 2 ký tự)"
-          >
-            <input 
-              nz-input 
-              formControlName="name" 
-              id="name" 
-              placeholder="Nhập tên chủ đề..."
-              class="topic-management__input"
-            />
-          </nz-form-control>
-        </nz-form-item>
+  <nz-modal [(nzVisible)]="isModalVisible" [nzTitle]="modalTitle" [nzClosable]="true" [nzMaskClosable]="false"
+    [nzWidth]="600" [nzFooter]="null" (nzOnCancel)="handleCancel()" class="topic-management__modal">
 
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="description">
-            <i class="fas fa-align-left"></i>
-            Mô tả
-          </nz-form-label>
-          <nz-form-control 
-            [nzSm]="18" 
-            [nzXs]="24" 
-            nzErrorTip="Vui lòng nhập mô tả (ít nhất 10 ký tự)"
-          >
-            <textarea 
-              nz-input 
-              formControlName="description" 
-              id="description" 
-              rows="4"
-              placeholder="Nhập mô tả chủ đề..."
-              class="topic-management__textarea"
-            ></textarea>
-          </nz-form-control>
-        </nz-form-item>
+    <ng-container *nzModalContent>
+      <div class="topic-management__modal-content">
+        <form [formGroup]="topicForm" (ngSubmit)="handleSubmit()">
+          <div class="row mb-3">
+            <div class="col-3">
+              <label for="name" class="form-label">
+                <i class="fas fa-tag"></i>
+                Tên chủ đề <span class="text-danger">*</span>
+              </label>
+            </div>
+            <div class="col-9">
+              <input nz-input formControlName="name" id="name" placeholder="Nhập tên chủ đề..."
+                class="form-control topic-management__input" />
+              <div *ngIf="topicForm.get('name')?.invalid && topicForm.get('name')?.touched" class="text-danger mt-1">
+                Vui lòng nhập tên chủ đề (ít nhất 2 ký tự)
+              </div>
+            </div>
+          </div>
 
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="level">
-            <i class="fas fa-layer-group"></i>
-            Cấp độ
-          </nz-form-label>
-          <nz-form-control [nzSm]="18" [nzXs]="24">
-            <nz-select 
-              formControlName="level" 
-              id="level" 
-              nzPlaceHolder="Chọn cấp độ"
-              class="topic-management__select"
-            >
-              <nz-option 
-                *ngFor="let option of levelOptions" 
-                [nzLabel]="option.label" 
-                [nzValue]="option.value"
-              >
-              </nz-option>
-            </nz-select>
-          </nz-form-control>
-        </nz-form-item>
+          <div class="row mb-3">
+            <div class="col-3">
+              <label for="description" class="form-label">
+                <i class="fas fa-align-left"></i>
+                Mô tả <span class="text-danger">*</span>
+              </label>
+            </div>
+            <div class="col-9">
+              <textarea nz-input formControlName="description" id="description" rows="4"
+                placeholder="Nhập mô tả chủ đề..." class="form-control topic-management__textarea"></textarea>
+              <div *ngIf="topicForm.get('description')?.invalid && topicForm.get('description')?.touched"
+                class="text-danger mt-1">
+                Vui lòng nhập mô tả (ít nhất 10 ký tự)
+              </div>
+            </div>
+          </div>
 
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="status">
-            <i class="fas fa-toggle-on"></i>
-            Trạng thái
-          </nz-form-label>
-          <nz-form-control [nzSm]="18" [nzXs]="24">
-            <nz-select 
-              formControlName="status" 
-              id="status" 
-              nzPlaceHolder="Chọn trạng thái"
-              class="topic-management__select"
-            >
-              <nz-option 
-                *ngFor="let option of statusOptions" 
-                [nzLabel]="option.label" 
-                [nzValue]="option.value"
-              >
-              </nz-option>
-            </nz-select>
-          </nz-form-control>
-        </nz-form-item>
+          <div class="row mb-3">
+            <div class="col-3">
+              <label for="level" class="form-label">
+                Cấp độ <span class="text-danger">*</span>
+              </label>
+            </div>
+            <div class="col-9">
+              <nz-select formControlName="level" id="level" nzPlaceHolder="Chọn cấp độ"
+                class="w-100 topic-management__select">
+                <nz-option *ngFor="let option of levelOptions" [nzLabel]="option.label" [nzValue]="option.value">
+                </nz-option>
+              </nz-select>
+            </div>
+          </div>
 
-        <nz-divider></nz-divider>
+          <div class="row mb-3">
+            <div class="col-3">
+              <label for="status" class="form-label">
+                <i class="fas fa-gear"></i>
+                Trạng thái <span class="text-danger">*</span>
+              </label>
+            </div>
+            <div class="col-9">
+              <nz-select formControlName="status" id="status" nzPlaceHolder="Chọn trạng thái"
+                class="w-100 topic-management__select">
+                <nz-option *ngFor="let option of statusOptions" [nzLabel]="option.label" [nzValue]="option.value">
+                </nz-option>
+              </nz-select>
+            </div>
+          </div>
 
-        <nz-form-item class="topic-management__modal-actions">
-          <nz-form-control [nzOffset]="6" [nzSm]="18" [nzXs]="24">
-            <nz-space nzSize="small">
-              <button 
-                *nzSpaceItem
-                nz-button 
-                nzType="default" 
-                (click)="handleCancel()"
-                class="topic-management__cancel-btn"
-              >
-                <i class="fas fa-times"></i>
+          <hr class="my-4">
+
+          <div class="row">
+            <div class="col-12 d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary mr-2" (click)="handleCancel()">
+                <span nz-icon nzType="close" nzTheme="outline"></span>
                 Hủy
               </button>
-              <button 
-                *nzSpaceItem
-                nz-button 
-                nzType="primary" 
-                type="submit"
-                [nzLoading]="isLoading"
-                class="topic-management__submit-btn"
-              >
+              <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-2"></span>
                 <i class="fas fa-save"></i>
                 {{ editingTopic ? 'Cập nhật' : 'Thêm mới' }}
               </button>
-            </nz-space>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-    </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-container>
   </nz-modal>
 </div>

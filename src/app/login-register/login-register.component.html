@@ -15,9 +15,9 @@
           </div>
 
           <div class="form-group">
-            <label for="loginEmail">Email</label>
-            <input type="text" id="loginEmail" class="form-control" placeholder="Nhập email của bạn"
-              formControlName="email" required>
+            <label for="loginEmail">User name</label>
+            <input type="text" id="loginEmail" class="form-control" placeholder="Nhập username của bạn"
+              formControlName="username" required>
           </div>
           <div class="form-group">
             <label for="loginPassword">Mật khẩu</label>
@@ -56,9 +56,14 @@
               formControlName="name" required>
           </div>
           <div class="form-group">
-            <label for="registerEmail">Email</label>
-            <input type="email" id="registerEmail" class="form-control" placeholder="Nhập email của bạn"
+            <label for="email">Email</label>
+            <input type="text" id="email" class="form-control" placeholder="Nhập Email"
               formControlName="email" required>
+          </div>
+          <div class="form-group">
+            <label for="registerEmail">User name</label>
+            <input type="username" id="registerEmail" class="form-control" placeholder="Nhập username của bạn"
+              formControlName="username" required>
           </div>
           <div class="form-group">
             <label for="registerPassword">Mật khẩu</label>
@@ -75,7 +80,7 @@
                 bảo mật</a></label>
           </div>
 
-          <button nz-button [nzType]="'primary'" [disabled]="registerForm.invalid" class="btn-submit">Tạo tài
+          <button nz-button [nzType]="'primary'" class="btn-submit">Tạo tài
             khoản</button>
 
           <div class="switch">

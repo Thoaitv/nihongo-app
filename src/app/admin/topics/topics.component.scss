@@ -1,7 +1,7 @@
-// topic-management.component.scss
+// vocabulary-management.component.scss
 @import 'bootstrap/scss/bootstrap';
 
-.topic-management {
+.vocabulary-management {
   padding: 20px;
   background-color: #f5f5f5;
   min-height: 100vh;
@@ -60,7 +60,6 @@
     .ant-input {
       border-radius: 20px;
       padding: 8px 16px;
-      border: 2px solid #e0e0e0;
       transition: all 0.3s ease;
 
       &:focus {
@@ -122,7 +121,6 @@
           background: #fafafa;
           font-weight: 600;
           color: #333;
-          border-bottom: 2px solid #e0e0e0;
           padding: 16px 12px;
         }
 
@@ -144,7 +142,7 @@
     }
   }
 
-  &__topic-name {
+  &__vocabulary-name {
     display: flex;
     align-items: center;
     font-weight: 500;
@@ -155,7 +153,7 @@
     }
   }
 
-  &__topic-icon {
+  &__vocabulary-icon {
     margin-right: 8px;
     color: #667eea;
     font-size: 14px;
@@ -269,7 +267,6 @@
   &__textarea,
   &__select {
     border-radius: 6px;
-    border: 2px solid #e0e0e0;
     transition: all 0.3s ease;
 
     &:focus {
