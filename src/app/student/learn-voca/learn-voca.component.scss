@@ -1,0 +1,491 @@
+// vocabulary-learning.component.scss
+.vocabulary-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0;
+
+  .header-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 20px;
+    text-align: center;
+    color: white;
+
+    .header-content {
+      max-width: 800px;
+      margin: 0 auto 30px;
+
+      .main-title {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
+        i {
+          margin-right: 15px;
+          color: #ffd700;
+        }
+
+        @media (max-width: 768px) {
+          font-size: 2rem;
+        }
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+      }
+    }
+
+    .filter-section {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .search-bar {
+        flex: 1;
+        max-width: 400px;
+
+        ::ng-deep .ant-input-group {
+          .ant-input {
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+            &:focus {
+              border-color: #40a9ff;
+              box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.2);
+            }
+          }
+
+          .ant-input-group-addon {
+            background: transparent;
+            border: none;
+
+            i {
+              color: #bfbfbf;
+            }
+          }
+        }
+      }
+
+      .level-filter {
+        min-width: 160px;
+
+        ::ng-deep .ant-select-selector {
+          border-radius: 25px;
+          padding: 5px 15px;
+          height: 42px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+          .ant-select-selection-item {
+            line-height: 30px;
+            color: #333;
+            font-weight: 500;
+          }
+
+          .ant-select-selection-placeholder {
+            line-height: 30px;
+            color: #bfbfbf;
+          }
+        }
+      }
+    }
+  }
+
+  .topics-section {
+    padding: 40px 20px;
+    background: #f8f9fa;
+    min-height: calc(100vh - 200px);
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 40px;
+      font-weight: 600;
+
+      i {
+        margin-right: 10px;
+        color: #667eea;
+      }
+    }
+
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto;
+
+      .topic-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .topic-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+
+          i {
+            font-size: 24px;
+            color: white;
+          }
+        }
+
+        .topic-content {
+          .topic-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+          }
+
+          .topic-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+          }
+
+          .topic-stats {
+            .vocab-count {
+              display: inline-block;
+              background: #f0f0f0;
+              padding: 5px 12px;
+              border-radius: 15px;
+              font-size: 0.9rem;
+              color: #666;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .vocabulary-section {
+    padding: 40px 20px;
+    background: #f8f9fa;
+    min-height: calc(100vh - 200px);
+
+    .vocabulary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .back-button {
+        border-radius: 25px;
+        padding: 8px 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+
+        i {
+          font-size: 14px;
+        }
+      }
+
+      .topic-info {
+        flex: 1;
+        text-align: center;
+
+        .current-topic {
+          font-size: 1.8rem;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 5px;
+
+          i {
+            margin-right: 10px;
+            font-size: 1.6rem;
+          }
+        }
+
+        .vocab-counter {
+          color: #666;
+          font-size: 0.95rem;
+          margin: 0;
+        }
+      }
+    }
+
+    .vocabulary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto;
+
+      @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+      }
+
+      .vocab-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+
+        &:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        &.playing {
+          border-color: #52c41a;
+          box-shadow: 0 0 0 4px rgba(82, 196, 26, 0.1);
+        }
+
+        .vocab-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+
+          .vocab-level {
+            ::ng-deep .ant-tag {
+              border-radius: 12px;
+              padding: 4px 10px;
+              font-weight: 500;
+              font-size: 0.85rem;
+            }
+          }
+
+          .play-button {
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            border: none;
+
+            &:hover {
+              background: #e6f7ff;
+              color: #1890ff;
+            }
+
+            i {
+              font-size: 16px;
+            }
+          }
+        }
+
+        .vocab-content {
+          .japanese-text {
+            margin-bottom: 15px;
+
+            .main-text {
+              font-size: 2rem;
+              font-weight: 700;
+              color: #333;
+              margin-bottom: 12px;
+              text-align: center;
+            }
+
+            .pronunciations {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+
+              .hiragana,
+              .katakana {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                .label {
+                  font-size: 0.85rem;
+                  color: #666;
+                  font-weight: 500;
+                  min-width: 70px;
+                }
+
+                .text {
+                  font-size: 1.1rem;
+                  color: #333;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+
+          ::ng-deep .ant-divider {
+            margin: 15px 0;
+            border-color: #f0f0f0;
+          }
+
+          .vietnamese-text {
+            margin-bottom: 15px;
+
+            .meaning {
+              font-size: 1.3rem;
+              font-weight: 600;
+              color: #1890ff;
+              margin-bottom: 8px;
+            }
+
+            .pronunciation {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              color: #666;
+              font-size: 0.95rem;
+
+              i {
+                color: #52c41a;
+              }
+            }
+          }
+
+          .example {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #40a9ff;
+
+            .example-text {
+              margin: 0;
+              font-style: italic;
+              color: #666;
+              line-height: 1.5;
+            }
+          }
+        }
+      }
+    }
+
+    .loading-section {
+      text-align: center;
+      padding: 40px 20px;
+
+      .loading-text {
+        margin-top: 15px;
+        color: #666;
+        font-size: 1rem;
+      }
+    }
+
+    .end-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+
+      i {
+        font-size: 3rem;
+        color: #52c41a;
+        margin-bottom: 15px;
+        display: block;
+      }
+
+      p {
+        font-size: 1.1rem;
+        margin: 0;
+      }
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    .vocabulary-section {
+      .vocabulary-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+
+        .vocab-card {
+          padding: 20px;
+
+          .vocab-content {
+            .japanese-text {
+              .main-text {
+                font-size: 1.6rem;
+              }
+            }
+
+            .vietnamese-text {
+              .meaning {
+                font-size: 1.1rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Animations
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .vocab-card {
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+  .topic-card {
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+  // Custom scrollbar
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+}

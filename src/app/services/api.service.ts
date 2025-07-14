@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:9092';
+  private baseUrl = 'http://localhost:9093';
 
   constructor(private http: HttpClient) {}
 
@@ -70,14 +70,31 @@ export class ApiService {
     );
   }
 
- 
   listVocabularies(page: number = 1, limit: number = 20) {
     const params = new HttpParams().set('page', page).set('limit', limit);
     return this.http.get(`${this.baseUrl}/vocabularies`, { params });
   }
 
   createVocabulary(formData: FormData): Observable<any> {
-  return this.http.post(`${this.baseUrl}/vocabulary`, formData);
-}
+    return this.http.post(`${this.baseUrl}/vocabulary`, formData);
+  }
 
+  // EXAM
+  getExams(limit: number = 10, page: number = 1): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/exams?limit=${limit}&page=${page}`
+    );
+  }
+
+  createExam(exam: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/exam`, exam);
+  }
+
+  getExamDetail(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/exam/${id}/questions`);
+  }
+
+  updateExam(id: number, exam: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/exam/${id}`, exam);
+  }
 }

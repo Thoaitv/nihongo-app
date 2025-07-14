@@ -44,7 +44,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 })
 export class LayoutStudentComponent {
   role = localStorage.getItem('role');
-  userName = localStorage.getItem('username')
+  userName = localStorage.getItem('username');
   constructor(private router: Router) {
     console.log('role', this.role);
   }
@@ -54,6 +54,10 @@ export class LayoutStudentComponent {
 
   goToProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  goToHistoryExam() {
+    this.router.navigate(['/goToHistoryExam']);
   }
 
   logout() {

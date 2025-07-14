@@ -1,1 +1,134 @@
-<p>learn-voca works!</p>
+<div class="vocabulary-container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-content">
+            <h1 class="main-title">
+                <i class="fas fa-graduation-cap"></i>
+                Học Từ Vựng Tiếng Nhật
+            </h1>
+            <p class="subtitle">Khám phá và nắm vững từ vựng tiếng Nhật theo chủ đề</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="filter-section">
+            <div class="search-bar">
+                <nz-input-group [nzPrefix]="prefixTemplateSearch">
+                    <input type="text" nz-input placeholder="Tìm kiếm từ vựng..." [(ngModel)]="searchTerm"
+                        (input)="onSearch()" />
+                </nz-input-group>
+                <ng-template #prefixTemplateSearch>
+                    <i class="fas fa-search"></i>
+                </ng-template>
+            </div>
+
+            <nz-select class="level-filter" [(ngModel)]="selectedLevel" (ngModelChange)="onLevelChange()"
+                nzPlaceHolder="Chọn cấp độ" nzAllowClear>
+                <nz-option nzValue="N5" nzLabel="N5 - Cơ bản"></nz-option>
+                <nz-option nzValue="N4" nzLabel="N4 - Sơ cấp"></nz-option>
+                <nz-option nzValue="N3" nzLabel="N3 - Trung cấp"></nz-option>
+                <nz-option nzValue="N2" nzLabel="N2 - Trung cao"></nz-option>
+                <nz-option nzValue="N1" nzLabel="N1 - Cao cấp"></nz-option>
+            </nz-select>
+        </div>
+    </div>
+
+    <!-- Topics Section -->
+    <div class="topics-section" *ngIf="!selectedTopic">
+        <h2 class="section-title">
+            <i class="fas fa-list-ul"></i>
+            Chọn Chủ Đề
+        </h2>
+        <div class="topics-grid">
+            <div *ngFor="let topic of topics" class="topic-card" [style.border-color]="topic.color"
+                (click)="selectTopic(topic)">
+                <div class="topic-icon" [style.background-color]="topic.color">
+                    <i [class]="topic.icon"></i>
+                </div>
+                <div class="topic-content">
+                    <h3 class="topic-name">{{ topic.nameVi }}</h3>
+                    <p class="topic-description">{{ topic.description }}</p>
+                    <div class="topic-stats">
+                        <span class="vocab-count">{{ getVocabCount(topic.id) }} từ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Section -->
+    <div class="vocabulary-section" *ngIf="selectedTopic">
+        <div class="vocabulary-header">
+            <button nz-button nzType="default" (click)="backToTopics()" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại
+            </button>
+            <div class="topic-info">
+                <h2 class="current-topic">
+                    <i [class]="selectedTopic.icon" [style.color]="selectedTopic.color"></i>
+                    {{ selectedTopic.nameVi }}
+                </h2>
+                <p class="vocab-counter">
+                    Hiển thị {{ displayedVocabularies.length }} / {{ filteredVocabularies.length }} từ
+                </p>
+            </div>
+        </div>
+
+        <div class="vocabulary-grid">
+            <div *ngFor="let vocab of displayedVocabularies; trackBy: trackByVocabId" class="vocab-card"
+                [class.playing]="currentPlaying === vocab.id">
+                <div class="vocab-header">
+                    <div class="vocab-level">
+                        <nz-tag [nzColor]="getLevelColor(vocab.level)">{{ vocab.level }}</nz-tag>
+                    </div>
+                    <button nz-button nzType="text" nzSize="small" (click)="playAudio(vocab)" class="play-button"
+                        [nzLoading]="currentPlaying === vocab.id">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+
+                <div class="vocab-content">
+                    <div class="japanese-text">
+                        <h3 class="main-text">{{ vocab.japanese }}</h3>
+                        <div class="pronunciations">
+                            <div class="hiragana">
+                                <span class="label">Hiragana:</span>
+                                <span class="text">{{ vocab.hiragana }}</span>
+                            </div>
+                            <div class="katakana" *ngIf="vocab.katakana">
+                                <span class="label">Katakana:</span>
+                                <span class="text">{{ vocab.katakana }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nz-divider></nz-divider>
+
+                    <div class="vietnamese-text">
+                        <h4 class="meaning">{{ vocab.vietnamese }}</h4>
+                        <div class="pronunciation">
+                            <i class="fas fa-volume-down"></i>
+                            <span>{{ vocab.pronunciation }}</span>
+                        </div>
+                    </div>
+
+                    <div class="example" *ngIf="vocab.example">
+                        <p class="example-text">{{ vocab.example }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-section" *ngIf="isLoading">
+            <nz-spin nzSize="large">
+                <div class="loading-text">Đang tải thêm từ vựng...</div>
+            </nz-spin>
+        </div>
+
+        <!-- End Message -->
+        <div class="end-message" *ngIf="!isLoading && !hasMoreData">
+            <i class="fas fa-check-circle"></i>
+            <p>Bạn đã xem hết tất cả từ vựng trong chủ đề này!</p>
+        </div>
+    </div>
+</div>

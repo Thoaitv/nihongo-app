@@ -1,0 +1,215 @@
+<div class="japanese-test-container">
+      <!-- Header -->
+      <div class="test-header">
+        <h1 class="test-title">
+          <i class="fas fa-language"></i>
+          日本語能力試験 (JLPT) 模擬テスト
+        </h1>
+        <div class="test-info">
+          <nz-tag nzColor="blue">
+            <i class="fas fa-clock"></i>
+            Time: {{formatTime(timeRemaining)}}
+          </nz-tag>
+          <nz-tag nzColor="green">
+            <i class="fas fa-question-circle"></i>
+            {{currentQuestionIndex + 1}} / {{questions.length}}
+          </nz-tag>
+          <nz-tag nzColor="orange">
+            <i class="fas fa-chart-line"></i>
+            Progress: {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
+          </nz-tag>
+        </div>
+      </div>
+
+      <!-- Test Content -->
+      <div class="test-content" *ngIf="!showResults">
+        <!-- Progress Bar -->
+        <nz-progress 
+          [nzPercent]="(currentQuestionIndex / questions.length) * 100"
+          nzStrokeColor="#1890ff"
+          [nzShowInfo]="false"
+          class="progress-bar">
+        </nz-progress>
+
+        <!-- Question Card -->
+        <nz-card class="question-card" [nzBordered]="false">
+          <div class="question-header">
+            <nz-tag [nzColor]="getQuestionTypeColor(currentQuestion.type)">
+              <i [class]="getQuestionTypeIcon(currentQuestion.type)"></i>
+              {{getQuestionTypeName(currentQuestion.type)}}
+            </nz-tag>
+            <span class="question-number">問題 {{currentQuestionIndex + 1}}</span>
+          </div>
+
+          <!-- Reading Passage -->
+          <div class="reading-passage" *ngIf="currentQuestion.type === 'reading' && currentQuestion.passage">
+            <h3>読解文</h3>
+            <div class="passage-text">{{currentQuestion.passage}}</div>
+            <nz-divider></nz-divider>
+          </div>
+
+          <!-- Listening Audio -->
+          <div class="listening-section" *ngIf="currentQuestion.type === 'listening'">
+            <div class="audio-controls">
+              <button nz-button nzType="primary" nzSize="large" (click)="playAudio()" class="play-button">
+                <i class="fas fa-play"></i>
+                音声を再生
+              </button>
+              <nz-tag nzColor="purple">
+                <i class="fas fa-headphones"></i>
+                聴解問題
+              </nz-tag>
+            </div>
+            <nz-divider></nz-divider>
+          </div>
+
+          <!-- Question -->
+          <div class="question-text">
+            <h3>{{currentQuestion.question}}</h3>
+          </div>
+
+          <!-- Options -->
+          <div class="options-container">
+            <nz-radio-group [(ngModel)]="selectedAnswer" class="options-group">
+              <div class="option-item" 
+                   *ngFor="let option of currentQuestion.options; let i = index"
+                   [class.selected]="selectedAnswer === i">
+                <label nz-radio [nzValue]="i" class="option-label">
+                  <span class="option-number">{{getOptionLetter(i)}}</span>
+                  <span class="option-text">{{option}}</span>
+                </label>
+              </div>
+            </nz-radio-group>
+          </div>
+
+          <!-- Navigation -->
+          <div class="question-navigation">
+            <button nz-button 
+                    [disabled]="currentQuestionIndex === 0" 
+                    (click)="previousQuestion()"
+                    class="nav-button">
+              <i class="fas fa-chevron-left"></i>
+              前の問題
+            </button>
+            
+            <button nz-button 
+                    nzType="primary" 
+                    [disabled]="selectedAnswer === null"
+                    (click)="nextQuestion()"
+                    class="nav-button next-button">
+              {{currentQuestionIndex === questions.length - 1 ? '結果を見る' : '次の問題'}}
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </nz-card>
+
+        <!-- Section Summary -->
+        <div class="section-summary">
+          <nz-card nzTitle="セクション別進捗" class="summary-card">
+            <div class="section-progress">
+              <div class="section-item">
+                <i class="fas fa-book-open"></i>
+                <span>読解: {{getSectionProgress('reading')}}</span>
+                <nz-progress [nzPercent]="getSectionPercentage('reading')" nzSize="small" nzStrokeColor="#52c41a"></nz-progress>
+              </div>
+              <div class="section-item">
+                <i class="fas fa-language"></i>
+                <span>語彙: {{getSectionProgress('vocabulary')}}</span>
+                <nz-progress [nzPercent]="getSectionPercentage('vocabulary')" nzSize="small" nzStrokeColor="#1890ff"></nz-progress>
+              </div>
+              <div class="section-item">
+                <i class="fas fa-headphones"></i>
+                <span>聴解: {{getSectionProgress('listening')}}</span>
+                <nz-progress [nzPercent]="getSectionPercentage('listening')" nzSize="small" nzStrokeColor="#722ed1"></nz-progress>
+              </div>
+            </div>
+          </nz-card>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="test-results" *ngIf="showResults">
+        <nz-result 
+          [nzIcon]="getResultIcon()"
+          [nzTitle]="getResultTitle()"
+          [nzSubTitle]="getResultSubtitle()">
+          
+          <div nz-result-content>
+            <div class="result-stats">
+              <div class="stat-row">
+                <!-- <nz-statistic 
+                  nzTitle="総合スコア" 
+                  [nzValue]="testResult.score" 
+                  nzSuffix="%" 
+                  [nzValueStyle]="{ color: getScoreColor() }">
+                </nz-statistic>
+                <nz-statistic 
+                  nzTitle="正解数" 
+                  [nzValue]="testResult.correctAnswers" 
+                  [nzSuffix]="'/' + testResult.totalQuestions">
+                </nz-statistic>
+                <nz-statistic 
+                  nzTitle="所要時間" 
+                  [nzValue]="formatTime(testResult.timeSpent)">
+                </nz-statistic> -->
+              </div>
+              
+              <nz-divider></nz-divider>
+              
+              <div class="section-results">
+                <h3>セクション別結果</h3>
+                <div class="section-result-item">
+                  <div class="section-header">
+                    <i class="fas fa-book-open"></i>
+                    <span>読解 (Reading)</span>
+                  </div>
+                  <div class="section-score">
+                    {{testResult?.sectionResults?.reading.correct}} / {{testResult?.sectionResults?.reading.total}}
+                    <nz-tag [nzColor]="getSectionResultColor(testResult?.sectionResults?.reading)">
+                      {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
+                    </nz-tag>
+                  </div>
+                </div>
+                
+                <div class="section-result-item">
+                  <div class="section-header">
+                    <i class="fas fa-language"></i>
+                    <span>語彙 (Vocabulary)</span>
+                  </div>
+                  <div class="section-score">
+                    {{testResult?.sectionResults?.vocabulary.correct}} / {{testResult?.sectionResults?.vocabulary.total}}
+                    <nz-tag [nzColor]="getSectionResultColor(testResult?.sectionResults?.vocabulary)">
+                      {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
+                    </nz-tag>
+                  </div>
+                </div>
+                
+                <div class="section-result-item">
+                  <div class="section-header">
+                    <i class="fas fa-headphones"></i>
+                    <span>聴解 (Listening)</span>
+                  </div>
+                  <div class="section-score">
+                    {{testResult?.sectionResults?.listening.correct}} / {{testResult?.sectionResults?.listening.total}}
+                    <nz-tag [nzColor]="getSectionResultColor(testResult?.sectionResults?.listening)">
+                      {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
+                    </nz-tag>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div nz-result-extra>
+            <button nz-button nzType="primary" (click)="restartTest()" class="restart-button">
+              <i class="fas fa-redo"></i>
+              もう一度テストを受ける
+            </button>
+            <button nz-button (click)="reviewAnswers()" class="review-button">
+              <i class="fas fa-eye"></i>
+              答えを確認する
+            </button>
+          </div>
+        </nz-result>
+      </div>
+    </div>

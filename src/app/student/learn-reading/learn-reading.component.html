@@ -1,0 +1,193 @@
+<div class="japanese-reading-container">
+  <div class="header-reading">
+    <h1>
+      <i class="fas fa-book-reader"></i>
+      Luyện đọc tiếng Nhật
+    </h1>
+    <p class="subtitle">Thực hành đọc hiểu và làm bài tập trắc nghiệm</p>
+  </div>
+
+  <div class="lessons-container">
+    <div class="lesson-card" *ngFor="let lesson of lessons">
+      <nz-card [nzTitle]="lesson.title" [nzExtra]="extraTemplate">
+        <ng-template #extraTemplate>
+          <nz-tag [nzColor]="'blue'">
+            <i class="fas fa-book"></i>
+            {{lesson.lessonType}}
+          </nz-tag>
+        </ng-template>
+
+        <!-- Reading Content Section -->
+        <div class="reading-section">
+          <div class="content-header">
+            <h3>
+              <i class="fas fa-file-alt"></i>
+              Nội dung bài đọc
+            </h3>
+          </div>
+          
+          <div class="content-body">
+            <div class="japanese-text">
+              <nz-typography>
+                <p nz-typography>{{lesson.content}}</p>
+              </nz-typography>
+            </div>
+            
+            <nz-divider nzText="Phiên âm"></nz-divider>
+            
+            <div class="jomaji-text">
+              <nz-typography>
+                <p nz-typography class="jomaji">{{lesson.jomaji}}</p>
+              </nz-typography>
+            </div>
+          </div>
+        </div>
+
+        <nz-divider nzText="Câu hỏi trắc nghiệm"></nz-divider>
+
+        <!-- Questions Section -->
+        <div class="questions-section">
+          <div class="progress-section">
+            <div class="progress-info">
+              <span class="progress-text">
+                <i class="fas fa-tasks"></i>
+                Tiến độ: {{getAnsweredCount(lesson)}}/{{lesson.questionResponseDtos.length}}
+              </span>
+            </div>
+            <nz-progress 
+              [nzPercent]="getProgressPercentage(lesson)"
+              [nzStatus]="getProgressPercentage(lesson) === 100 ? 'success' : 'active'"
+              [nzStrokeWidth]="8">
+            </nz-progress>
+          </div>
+
+          <div class="question-item" *ngFor="let question of lesson.questionResponseDtos; let i = index">
+            <div class="question-header">
+              <h4>
+                <i class="fas fa-question-circle"></i>
+                Câu {{i + 1}}: {{question.questionText}}
+              </h4>
+              <nz-tag 
+                *ngIf="isQuestionAnswered(question.id)"
+                [nzColor]="'green'">
+                <i class="fas fa-check"></i>
+                Đã trả lời
+              </nz-tag>
+            </div>
+            
+            <div class="choices-container">
+              <nz-radio-group 
+                [ngModel]="getSelectedAnswer(question.id)"
+                (ngModelChange)="onAnswerChange(question.id, $event, lesson)">
+                <div class="choice-item" *ngFor="let choice of question.questionChoiceResponseDtos">
+                  <label nz-radio [nzValue]="choice.selectChoiceCode">
+                    <span class="choice-code">{{choice.selectChoiceCode}}.</span>
+                    <span class="choice-text">{{choice.choiceText}}</span>
+                  </label>
+                </div>
+              </nz-radio-group>
+            </div>
+          </div>
+
+          <div class="quiz-actions">
+            <button 
+              nz-button 
+              nzType="primary" 
+              nzSize="large"
+              (click)="submitQuiz(lesson)"
+              [disabled]="getAnsweredCount(lesson) !== lesson.questionResponseDtos.length">
+              <i class="fas fa-paper-plane"></i>
+              Nộp bài
+            </button>
+            
+            <button 
+              nz-button 
+              nzType="default" 
+              nzSize="large"
+              (click)="resetQuiz(lesson)">
+              <i class="fas fa-redo"></i>
+              Làm lại
+            </button>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div class="loading-container" *ngIf="loading">
+    <nz-spin nzTip="Đang tải thêm bài học..." [nzSize]="'large'">
+      <div class="loading-content"></div>
+    </nz-spin>
+  </div>
+
+  <!-- End of Content -->
+  <div class="end-message" *ngIf="!hasMore && !loading">
+    <nz-result
+      nzIcon="check-circle"
+      nzTitle="Bạn đã hoàn thành tất cả các bài học!"
+      nzSubTitle="Chúc mừng bạn đã luyện tập chăm chỉ. Hãy tiếp tục ôn luyện để nâng cao kỹ năng đọc tiếng Nhật.">
+      <div nz-result-extra>
+        <button nz-button nzType="primary" (click)="scrollToTop()">
+          <i class="fas fa-arrow-up"></i>
+          Về đầu trang
+        </button>
+      </div>
+    </nz-result>
+  </div>
+</div>
+
+<!-- Result Modal -->
+<nz-modal
+  [(nzVisible)]="isResultModalVisible"
+  nzTitle="Kết quả bài thi"
+  [nzFooter]="null"
+  (nzOnCancel)="closeResultModal()"
+  nzWidth="500px">
+  
+  <ng-container *nzModalContent>
+    <div class="result-content">
+      <div class="score-display">
+        <div class="score-circle">
+          <nz-progress
+            [nzPercent]="(currentScore / totalQuestions) * 100"
+            nzType="circle"
+            [nzWidth]="120">
+          </nz-progress>
+        </div>
+        
+        <div class="score-details">
+          <h3>{{currentScore}}/{{totalQuestions}}</h3>
+          <p>Số câu đúng</p>
+        </div>
+      </div>
+
+      <div class="result-message">
+        <div *ngIf="(currentScore / totalQuestions) >= 0.8" class="excellent">
+          <i class="fas fa-trophy"></i>
+          <h4>Xuất sắc!</h4>
+          <p>Bạn đã làm rất tốt. Tiếp tục phát huy nhé!</p>
+        </div>
+        
+        <div *ngIf="(currentScore / totalQuestions) >= 0.6 && (currentScore / totalQuestions) < 0.8" class="good">
+          <i class="fas fa-thumbs-up"></i>
+          <h4>Tốt!</h4>
+          <p>Kết quả khá tốt. Hãy cố gắng hơn một chút nữa!</p>
+        </div>
+        
+        <div *ngIf="(currentScore / totalQuestions) < 0.6" class="needs-improvement">
+          <i class="fas fa-book-open"></i>
+          <h4>Cần cải thiện</h4>
+          <p>Hãy ôn lại bài học và thử lại nhé!</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button nz-button nzType="primary" (click)="closeResultModal()">
+          <i class="fas fa-check"></i>
+          Đã hiểu
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</nz-modal>
