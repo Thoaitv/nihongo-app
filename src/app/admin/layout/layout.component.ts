@@ -66,12 +66,12 @@ export class LayoutComponent implements OnInit {
   };
 
   menuItems: MenuItemData[] = [
-    {
-      key: 'dashboard',
-      title: 'Tổng quan',
-      icon: 'fas fa-tachometer-alt',
-      route: '/admin/dashboard',
-    },
+    // {
+    //   key: 'dashboard',
+    //   title: 'Tổng quan',
+    //   icon: 'fas fa-tachometer-alt',
+    //   route: '/admin/dashboard',
+    // },
     {
       key: 'content-management',
       title: 'Quản lý nội dung',
@@ -126,20 +126,6 @@ export class LayoutComponent implements OnInit {
           route: '/admin/students',
           badge: 1250,
         },
-        {
-          key: 'teachers',
-          title: 'Giáo viên',
-          icon: 'fas fa-chalkboard-teacher',
-          route: '/admin/teachers',
-          badge: 15,
-        },
-        {
-          key: 'admins',
-          title: 'Quản trị viên',
-          icon: 'fas fa-user-shield',
-          route: '/admin/admins',
-          badge: 3,
-        },
       ],
     },
     {
@@ -151,79 +137,14 @@ export class LayoutComponent implements OnInit {
           key: 'tests',
           title: 'Bài kiểm tra',
           icon: 'fas fa-file-text',
-          route: '/admin/tests',
+          route: '/admin/exam',
           badge: 25,
-        },
-        {
-          key: 'questions',
-          title: 'Câu hỏi',
-          icon: 'fas fa-question-circle',
-          route: '/admin/questions',
-          badge: 340,
         },
         {
           key: 'results',
           title: 'Kết quả',
           icon: 'fas fa-chart-line',
           route: '/admin/results',
-        },
-      ],
-    },
-    {
-      key: 'progress-tracking',
-      title: 'Theo dõi tiến độ',
-      icon: 'fas fa-chart-bar',
-      children: [
-        {
-          key: 'student-progress',
-          title: 'Tiến độ học viên',
-          icon: 'fas fa-user-clock',
-          route: '/admin/student-progress',
-        },
-        {
-          key: 'learning-analytics',
-          title: 'Phân tích học tập',
-          icon: 'fas fa-analytics',
-          route: '/admin/learning-analytics',
-        },
-        {
-          key: 'completion-rates',
-          title: 'Tỷ lệ hoàn thành',
-          icon: 'fas fa-percentage',
-          route: '/admin/completion-rates',
-        },
-      ],
-    },
-   
- 
-    {
-      key: 'system',
-      title: 'Hệ thống',
-      icon: 'fas fa-cogs',
-      children: [
-        {
-          key: 'settings',
-          title: 'Cài đặt',
-          icon: 'fas fa-sliders-h',
-          route: '/admin/settings',
-        },
-        {
-          key: 'backup',
-          title: 'Sao lưu',
-          icon: 'fas fa-database',
-          route: '/admin/backup',
-        },
-        {
-          key: 'logs',
-          title: 'Nhật ký',
-          icon: 'fas fa-file-alt',
-          route: '/admin/logs',
-        },
-        {
-          key: 'maintenance',
-          title: 'Bảo trì',
-          icon: 'fas fa-tools',
-          route: '/admin/maintenance',
         },
       ],
     },

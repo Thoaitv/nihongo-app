@@ -1,0 +1,154 @@
+<div class="exam-management">
+    <div class="header-exam-management">
+        <h2>Quản lý bài thi</h2>
+        <button nz-button nzType="primary" (click)="showCreateModal()">
+            <i class="fas fa-plus"></i>
+            Tạo bài thi mới
+        </button>
+    </div>
+
+    <nz-table #examTable [nzData]="exams" [nzLoading]="loading" [nzTotal]="total" [nzPageSize]="pageSize"
+        [nzPageIndex]="currentPage" [nzShowPagination]="true" [nzShowSizeChanger]="true" [nzShowQuickJumper]="true"
+        (nzPageIndexChange)="onPageChange($event)">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tiêu đề</th>
+                <th>Mô tả</th>
+                <th nzWidth="200px">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let exam of exams">
+                <td>{{ exam.id }}</td>
+                <td>{{ exam.title }}</td>
+                <td>{{ exam.description }}</td>
+                <td>
+                    <button nz-button nzType="link" (click)="showViewModal(exam)">
+                        <i class="fas fa-eye"></i>
+                        Xem
+                    </button>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <button nz-button nzType="link" (click)="showEditModal(exam)">
+                        <i class="fas fa-edit"></i>
+                        Sửa
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </nz-table>
+
+    <!-- Modal for Create/Edit/View -->
+    <nz-modal [(nzVisible)]="isModalVisible" [nzTitle]="modalTitle" [nzOkText]="modalMode === 'view' ? 'Đóng' : 'Lưu'"
+        [nzCancelText]="modalMode === 'view' ? null : 'Hủy'" [nzWidth]="800" [nzMaskClosable]="false"
+        (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+        <ng-container *nzModalContent>
+            <form nz-form [formGroup]="examForm" [nzLayout]="'vertical'">
+                <!-- Basic Information -->
+                <nz-card nzTitle="Thông tin cơ bản" [nzSize]="'small'">
+                    <div nz-row [nzGutter]="16">
+                        <div nz-col [nzSpan]="24">
+                            <nz-form-item>
+                                <nz-form-label nzRequired>Tiêu đề</nz-form-label>
+                                <nz-form-control nzErrorTip="Vui lòng nhập tiêu đề">
+                                    <input nz-input formControlName="title" placeholder="Nhập tiêu đề bài thi"
+                                        [readonly]="isReadonly" />
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                        <div nz-col [nzSpan]="24">
+                            <nz-form-item>
+                                <nz-form-label nzRequired>Mô tả</nz-form-label>
+                                <nz-form-control nzErrorTip="Vui lòng nhập mô tả">
+                                    <textarea nz-input formControlName="description" placeholder="Nhập mô tả bài thi"
+                                        [readonly]="isReadonly"></textarea>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                    </div>
+                </nz-card>
+
+                <!-- Questions -->
+                <nz-card nzTitle="Câu hỏi" [nzSize]="'small'" class="questions-card">
+                    <div formArrayName="examQuestionRequestDtos">
+                        <div *ngFor="let question of questionsFormArray.controls; let i = index" [formGroupName]="i"
+                            class="question-item">
+                            <nz-card [nzTitle]="'Câu hỏi ' + (i + 1)" [nzSize]="'small'" [nzExtra]="questionExtra">
+                                <ng-template #questionExtra>
+                                    <button *ngIf="!isReadonly" nz-button nzType="text" nzDanger
+                                        (click)="removeQuestion(i)" [disabled]="questionsFormArray.length === 1">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </ng-template>
+
+                                <nz-form-item>
+                                    <nz-form-label nzRequired>Nội dung câu hỏi</nz-form-label>
+                                    <nz-form-control nzErrorTip="Vui lòng nhập nội dung câu hỏi">
+                                        <textarea nz-input formControlName="questionText"
+                                            placeholder="Nhập nội dung câu hỏi" [readonly]="isReadonly"></textarea>
+                                    </nz-form-control>
+                                </nz-form-item>
+
+                                <nz-form-item>
+                                    <nz-form-label nzRequired>Giải thích</nz-form-label>
+                                    <nz-form-control nzErrorTip="Vui lòng nhập giải thích">
+                                        <textarea nz-input formControlName="explanation"
+                                            placeholder="Nhập giải thích cho câu hỏi"
+                                            [readonly]="isReadonly"></textarea>
+                                    </nz-form-control>
+                                </nz-form-item>
+
+                                <!-- Choices -->
+                                <div formArrayName="questionChoicesRequestDtos">
+                                    <nz-form-label>Các lựa chọn</nz-form-label>
+                                    <div *ngFor="let choice of getChoicesFormArray(i).controls; let j = index"
+                                        [formGroupName]="j" class="choice-item">
+                                        <div nz-row [nzGutter]="8" nzAlign="middle">
+                                            <div nz-col [nzSpan]="16">
+                                                <nz-form-control nzErrorTip="Vui lòng nhập nội dung lựa chọn">
+                                                    <input nz-input formControlName="choiceText"
+                                                        [placeholder]="'Lựa chọn ' + (j + 1)" [readonly]="isReadonly" />
+                                                </nz-form-control>
+                                            </div>
+                                            <div nz-col [nzSpan]="4">
+                                                <nz-form-control>
+                                                    <input nz-input formControlName="selectChoiceCode" placeholder="Mã"
+                                                        [readonly]="isReadonly" />
+                                                </nz-form-control>
+                                            </div>
+                                            <div nz-col [nzSpan]="2">
+                                                <nz-form-control>
+                                                    <nz-switch formControlName="correct" nzCheckedChildren="Đúng"
+                                                        nzUnCheckedChildren="Sai" [nzDisabled]="isReadonly"
+                                                        (ngModelChange)="onCorrectChoiceChange(i, j, $event)"></nz-switch>
+                                                </nz-form-control>
+                                            </div>
+                                            <div nz-col [nzSpan]="2">
+                                                <button *ngIf="!isReadonly" nz-button nzType="text" nzDanger
+                                                    (click)="removeChoice(i, j)"
+                                                    [disabled]="getChoicesFormArray(i).length === 1">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button *ngIf="!isReadonly" nz-button nzType="dashed" (click)="addChoice(i)"
+                                        class="add-choice-btn">
+                                        <i class="fas fa-plus"></i>
+                                        Thêm lựa chọn
+                                    </button>
+                                </div>
+                            </nz-card>
+                        </div>
+                    </div>
+
+                    <button *ngIf="!isReadonly" nz-button nzType="dashed" (click)="addQuestion()"
+                        class="add-question-btn">
+                        <i class="fas fa-plus"></i>
+                        Thêm câu hỏi
+                    </button>
+                </nz-card>
+            </form>
+        </ng-container>
+    </nz-modal>
+</div>
