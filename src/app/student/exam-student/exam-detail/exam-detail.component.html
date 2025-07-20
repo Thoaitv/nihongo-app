@@ -1,0 +1,192 @@
+<div class="exam-container">
+    <nz-spin [nzSpinning]="loading">
+        <!-- Header -->
+        <div class="exam-header">
+            <div class="header-content">
+                <h1 class="exam-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    {{ examData?.title }}
+                </h1>
+                <p class="exam-description">{{ examData?.description }}</p>
+
+                <!-- Progress -->
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Tiến độ: {{ answeredCount }}/{{ totalQuestions }}</span>
+                        <span class="time-info">
+                            <i class="fas fa-clock"></i>
+                            Thời gian: {{ formatTime(elapsedTime) }}
+                        </span>
+                    </div>
+                    <nz-progress [nzPercent]="progressPercent" [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }">
+                    </nz-progress>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listening Section -->
+        <div class="section-container" *ngFor="let lesson of listeningLessons">
+            <nz-card class="lesson-card listening-card">
+                <div class="lesson-header">
+                    <h2>
+                        <i class="fas fa-headphones"></i>
+                        {{ lesson.title }}
+                    </h2>
+                    <nz-tag nzColor="blue">NGHE</nz-tag>
+                </div>
+
+                <div class="lesson-content">
+                    <p class="jomaji" *ngIf="lesson.jomaji">
+                        <i class="fas fa-language"></i>
+                        Phiên âm: {{ lesson.jomaji }}
+                    </p>
+
+                    <!-- Audio Player -->
+                    <div class="audio-section" *ngIf="lesson.audioLink">
+                        <audio controls class="audio-player">
+                            <source [src]="lesson.audioLink" type="audio/mpeg">
+                            Trình duyệt của bạn không hỗ trợ audio.
+                        </audio>
+                    </div>
+
+                    <!-- Questions -->
+                    <div class="questions-section">
+                        <div class="question-item"
+                            *ngFor="let question of lesson.questionResponseDtos; let qIndex = index">
+                            <div class="question-header">
+                                <span class="question-number">Câu {{ qIndex + 1 }}</span>
+                                <span class="question-status"
+                                    [class.answered]="isQuestionAnswered('lesson', lesson.id, question.id)">
+                                    <i class="fas"
+                                        [class.fa-check-circle]="isQuestionAnswered('lesson', lesson.id, question.id)"
+                                        [class.fa-circle]="!isQuestionAnswered('lesson', lesson.id, question.id)"></i>
+                                </span>
+                            </div>
+
+                            <h4 class="question-text">{{ question.questionText }}</h4>
+
+                            <nz-radio-group [ngModel]="getAnswer('lesson', lesson.id, question.id)"
+                                (ngModelChange)="setAnswer('lesson', lesson.id, question.id, $event)">
+                                <div class="choices-grid">
+                                    <label nz-radio *ngFor="let choice of question.questionChoiceResponseDtos"
+                                        [nzValue]="choice.selectChoiceCode" class="choice-item">
+                                        <span class="choice-code">{{ choice.selectChoiceCode }}</span>
+                                        <span class="choice-text">{{ choice.choiceText }}</span>
+                                    </label>
+                                </div>
+                            </nz-radio-group>
+                        </div>
+                    </div>
+                </div>
+            </nz-card>
+        </div>
+
+        <!-- Reading Section -->
+        <div class="section-container" *ngFor="let lesson of readingLessons">
+            <nz-card class="lesson-card reading-card">
+                <div class="lesson-header">
+                    <h2>
+                        <i class="fas fa-book-open"></i>
+                        {{ lesson.title }}
+                    </h2>
+                    <nz-tag nzColor="green">ĐỌC</nz-tag>
+                </div>
+
+                <div class="lesson-content">
+                    <p class="jomaji" *ngIf="lesson.jomaji">
+                        <i class="fas fa-language"></i>
+                        Phiên âm: {{ lesson.jomaji }}
+                    </p>
+
+                    <!-- Questions -->
+                    <div class="questions-section">
+                        <div class="question-item"
+                            *ngFor="let question of lesson.questionResponseDtos; let qIndex = index">
+                            <div class="question-header">
+                                <span class="question-number">Câu {{ qIndex + 1 }}</span>
+                                <span class="question-status"
+                                    [class.answered]="isQuestionAnswered('lesson', lesson.id, question.id)">
+                                    <i class="fas"
+                                        [class.fa-check-circle]="isQuestionAnswered('lesson', lesson.id, question.id)"
+                                        [class.fa-circle]="!isQuestionAnswered('lesson', lesson.id, question.id)"></i>
+                                </span>
+                            </div>
+
+                            <h4 class="question-text">{{ question.questionText }}</h4>
+
+                            <nz-radio-group [ngModel]="getAnswer('lesson', lesson.id, question.id)"
+                                (ngModelChange)="setAnswer('lesson', lesson.id, question.id, $event)">
+                                <div class="choices-grid">
+                                    <label nz-radio *ngFor="let choice of question.questionChoiceResponseDtos"
+                                        [nzValue]="choice.selectChoiceCode" class="choice-item">
+                                        <span class="choice-code">{{ choice.selectChoiceCode }}</span>
+                                        <span class="choice-text">{{ choice.choiceText }}</span>
+                                    </label>
+                                </div>
+                            </nz-radio-group>
+                        </div>
+                    </div>
+                </div>
+            </nz-card>
+        </div>
+
+        <!-- Exam Questions Section -->
+        <div class="section-container" *ngIf="examData?.examQuestionResponseDtos?.length">
+            <nz-card class="lesson-card exam-card">
+                <div class="lesson-header">
+                    <h2>
+                        <i class="fas fa-clipboard-list"></i>
+                        Câu hỏi thi
+                    </h2>
+                    <nz-tag nzColor="purple">KIỂM TRA</nz-tag>
+                </div>
+
+                <div class="lesson-content">
+                    <div class="questions-section">
+                        <div class="question-item"
+                            *ngFor="let question of examData.examQuestionResponseDtos; let qIndex = index">
+                            <div class="question-header">
+                                <span class="question-number">Câu {{ qIndex + 1 }}</span>
+                                <span class="question-status"
+                                    [class.answered]="isQuestionAnswered('exam', 0, question.id)">
+                                    <i class="fas" [class.fa-check-circle]="isQuestionAnswered('exam', 0, question.id)"
+                                        [class.fa-circle]="!isQuestionAnswered('exam', 0, question.id)"></i>
+                                </span>
+                            </div>
+
+                            <h4 class="question-text">{{ question.questionText }}</h4>
+
+                            <nz-radio-group [ngModel]="getAnswer('exam', 0, question.id)"
+                                (ngModelChange)="setAnswer('exam', 0, question.id, $event)">
+                                <div class="choices-grid">
+                                    <label nz-radio *ngFor="let choice of question.questionChoiceResponseDtos"
+                                        [nzValue]="choice.selectChoiceCode" class="choice-item">
+                                        <span class="choice-code">{{ choice.selectChoiceCode }}</span>
+                                        <span class="choice-text">{{ choice.choiceText }}</span>
+                                    </label>
+                                </div>
+                            </nz-radio-group>
+                        </div>
+                    </div>
+                </div>
+            </nz-card>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="submit-section">
+            <button nz-button nzType="primary" nzSize="large" [nzLoading]="submitting" (click)="submitExam()"
+                class="submit-button">
+                <i class="fas fa-paper-plane"></i>
+                Nộp bài thi
+            </button>
+
+            <div class="submit-info">
+                <p>Đã trả lời: <strong>{{ answeredCount }}/{{ totalQuestions }}</strong> câu</p>
+                <p *ngIf="answeredCount < totalQuestions" class="warning-text">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Bạn chưa trả lời hết tất cả câu hỏi
+                </p>
+            </div>
+        </div>
+    </nz-spin>
+</div>

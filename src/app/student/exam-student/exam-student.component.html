@@ -1,215 +1,115 @@
-<div class="japanese-test-container">
-      <!-- Header -->
-      <div class="test-header">
-        <h1 class="test-title">
-          <i class="fas fa-language"></i>
-          日本語能力試験 (JLPT) 模擬テスト
-        </h1>
-        <div class="test-info">
-          <nz-tag nzColor="blue">
-            <i class="fas fa-clock"></i>
-            Time: {{formatTime(timeRemaining)}}
-          </nz-tag>
-          <nz-tag nzColor="green">
-            <i class="fas fa-question-circle"></i>
-            {{currentQuestionIndex + 1}} / {{questions.length}}
-          </nz-tag>
-          <nz-tag nzColor="orange">
-            <i class="fas fa-chart-line"></i>
-            Progress: {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
+<div class="exam-list-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="title-section">
+      <h1 class="page-title">
+        <i class="fas fa-graduation-cap"></i>
+        Danh Sách Bài Thi Tiếng Nhật
+      </h1>
+      <p class="page-subtitle">Khám phá và luyện tập với các bài thi đa dạng</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <nz-card class="search-card" nzSize="small">
+      <div nz-flex nzJustify="space-between" nzAlign="center" nzWrap="wrap" nzGap="16">
+        <div nz-flex nzAlign="center" nzGap="12" class="search-section">
+          <nz-input-group nzPrefixIcon="search" nzSize="large">
+            <input nz-input placeholder="Tìm kiếm bài thi..." [(ngModel)]="searchTerm" (input)="onSearch()"
+              class="search-input" />
+          </nz-input-group>
+          <button nz-button nzType="primary" nzSize="large" (click)="loadExams()" [nzLoading]="loading()">
+            <i class="fas fa-sync-alt"></i>
+            Làm mới
+          </button>
+        </div>
+
+        <div class="stats-section">
+          <nz-tag nzColor="blue" class="stats-tag">
+            <i class="fas fa-list-ol"></i>
+            Tổng: {{ totalExams() }} bài thi
           </nz-tag>
         </div>
       </div>
+    </nz-card>
+  </div>
 
-      <!-- Test Content -->
-      <div class="test-content" *ngIf="!showResults">
-        <!-- Progress Bar -->
-        <nz-progress 
-          [nzPercent]="(currentQuestionIndex / questions.length) * 100"
-          nzStrokeColor="#1890ff"
-          [nzShowInfo]="false"
-          class="progress-bar">
-        </nz-progress>
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <nz-spin nzSize="large" nzTip="Đang tải danh sách bài thi...">
+      <div class="loading-content"></div>
+    </nz-spin>
+  </div>
 
-        <!-- Question Card -->
-        <nz-card class="question-card" [nzBordered]="false">
-          <div class="question-header">
-            <nz-tag [nzColor]="getQuestionTypeColor(currentQuestion.type)">
-              <i [class]="getQuestionTypeIcon(currentQuestion.type)"></i>
-              {{getQuestionTypeName(currentQuestion.type)}}
-            </nz-tag>
-            <span class="question-number">問題 {{currentQuestionIndex + 1}}</span>
-          </div>
-
-          <!-- Reading Passage -->
-          <div class="reading-passage" *ngIf="currentQuestion.type === 'reading' && currentQuestion.passage">
-            <h3>読解文</h3>
-            <div class="passage-text">{{currentQuestion.passage}}</div>
-            <nz-divider></nz-divider>
-          </div>
-
-          <!-- Listening Audio -->
-          <div class="listening-section" *ngIf="currentQuestion.type === 'listening'">
-            <div class="audio-controls">
-              <button nz-button nzType="primary" nzSize="large" (click)="playAudio()" class="play-button">
-                <i class="fas fa-play"></i>
-                音声を再生
-              </button>
-              <nz-tag nzColor="purple">
-                <i class="fas fa-headphones"></i>
-                聴解問題
+  <!-- Exam List -->
+  <div *ngIf="!loading()" class="exam-grid">
+    <div nz-row [nzGutter]="[24, 24]">
+      <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8" nzXl="6"
+        *ngFor="let exam of examList(); trackBy: trackByExamId">
+        <nz-card class="exam-card" [nzHoverable]="true" [nzActions]="[actionStart, actionDetails]" (click)="navigateToReading(exam.id)">
+          <div class="exam-card-content">
+            <div class="exam-header">
+              <h3 class="exam-title" [title]="exam.title">
+                <i class="fas fa-file-alt"></i>
+                {{ exam.title }}
+              </h3>
+              <nz-tag nzColor="green" class="exam-id-tag">
+                ID: {{ exam.id }}
               </nz-tag>
             </div>
-            <nz-divider></nz-divider>
-          </div>
 
-          <!-- Question -->
-          <div class="question-text">
-            <h3>{{currentQuestion.question}}</h3>
-          </div>
+            <nz-divider nzDashed></nz-divider>
 
-          <!-- Options -->
-          <div class="options-container">
-            <nz-radio-group [(ngModel)]="selectedAnswer" class="options-group">
-              <div class="option-item" 
-                   *ngFor="let option of currentQuestion.options; let i = index"
-                   [class.selected]="selectedAnswer === i">
-                <label nz-radio [nzValue]="i" class="option-label">
-                  <span class="option-number">{{getOptionLetter(i)}}</span>
-                  <span class="option-text">{{option}}</span>
-                </label>
-              </div>
-            </nz-radio-group>
-          </div>
-
-          <!-- Navigation -->
-          <div class="question-navigation">
-            <button nz-button 
-                    [disabled]="currentQuestionIndex === 0" 
-                    (click)="previousQuestion()"
-                    class="nav-button">
-              <i class="fas fa-chevron-left"></i>
-              前の問題
-            </button>
-            
-            <button nz-button 
-                    nzType="primary" 
-                    [disabled]="selectedAnswer === null"
-                    (click)="nextQuestion()"
-                    class="nav-button next-button">
-              {{currentQuestionIndex === questions.length - 1 ? '結果を見る' : '次の問題'}}
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </nz-card>
-
-        <!-- Section Summary -->
-        <div class="section-summary">
-          <nz-card nzTitle="セクション別進捗" class="summary-card">
-            <div class="section-progress">
-              <div class="section-item">
-                <i class="fas fa-book-open"></i>
-                <span>読解: {{getSectionProgress('reading')}}</span>
-                <nz-progress [nzPercent]="getSectionPercentage('reading')" nzSize="small" nzStrokeColor="#52c41a"></nz-progress>
-              </div>
-              <div class="section-item">
-                <i class="fas fa-language"></i>
-                <span>語彙: {{getSectionProgress('vocabulary')}}</span>
-                <nz-progress [nzPercent]="getSectionPercentage('vocabulary')" nzSize="small" nzStrokeColor="#1890ff"></nz-progress>
-              </div>
-              <div class="section-item">
-                <i class="fas fa-headphones"></i>
-                <span>聴解: {{getSectionProgress('listening')}}</span>
-                <nz-progress [nzPercent]="getSectionPercentage('listening')" nzSize="small" nzStrokeColor="#722ed1"></nz-progress>
-              </div>
+            <div class="exam-description">
+              <p [title]="exam.description">
+                <i class="fas fa-info-circle"></i>
+                {{ exam.description || 'Không có mô tả' }}
+              </p>
             </div>
-          </nz-card>
-        </div>
-      </div>
 
-      <!-- Results -->
-      <div class="test-results" *ngIf="showResults">
-        <nz-result 
-          [nzIcon]="getResultIcon()"
-          [nzTitle]="getResultTitle()"
-          [nzSubTitle]="getResultSubtitle()">
-          
-          <div nz-result-content>
-            <div class="result-stats">
-              <div class="stat-row">
-                <!-- <nz-statistic 
-                  nzTitle="総合スコア" 
-                  [nzValue]="testResult.score" 
-                  nzSuffix="%" 
-                  [nzValueStyle]="{ color: getScoreColor() }">
-                </nz-statistic>
-                <nz-statistic 
-                  nzTitle="正解数" 
-                  [nzValue]="testResult.correctAnswers" 
-                  [nzSuffix]="'/' + testResult.totalQuestions">
-                </nz-statistic>
-                <nz-statistic 
-                  nzTitle="所要時間" 
-                  [nzValue]="formatTime(testResult.timeSpent)">
-                </nz-statistic> -->
+            <div class="exam-meta">
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>Thời gian: 60 phút</span>
               </div>
-              
-              <nz-divider></nz-divider>
-              
-              <div class="section-results">
-                <h3>セクション別結果</h3>
-                <div class="section-result-item">
-                  <div class="section-header">
-                    <i class="fas fa-book-open"></i>
-                    <span>読解 (Reading)</span>
-                  </div>
-                  <div class="section-score">
-                    {{testResult?.sectionResults?.reading.correct}} / {{testResult?.sectionResults?.reading.total}}
-                    <nz-tag [nzColor]="getSectionResultColor(testResult?.sectionResults?.reading)">
-                      {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
-                    </nz-tag>
-                  </div>
-                </div>
-                
-                <div class="section-result-item">
-                  <div class="section-header">
-                    <i class="fas fa-language"></i>
-                    <span>語彙 (Vocabulary)</span>
-                  </div>
-                  <div class="section-score">
-                    {{testResult?.sectionResults?.vocabulary.correct}} / {{testResult?.sectionResults?.vocabulary.total}}
-                    <nz-tag [nzColor]="getSectionResultColor(testResult?.sectionResults?.vocabulary)">
-                      {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
-                    </nz-tag>
-                  </div>
-                </div>
-                
-                <div class="section-result-item">
-                  <div class="section-header">
-                    <i class="fas fa-headphones"></i>
-                    <span>聴解 (Listening)</span>
-                  </div>
-                  <div class="section-score">
-                    {{testResult?.sectionResults?.listening.correct}} / {{testResult?.sectionResults?.listening.total}}
-                    <nz-tag [nzColor]="getSectionResultColor(testResult?.sectionResults?.listening)">
-                      {{ roundPercentage(testResult?.sectionResults?.reading.correct, testResult?.sectionResults?.reading.total) }}%
-                    </nz-tag>
-                  </div>
-                </div>
+              <div class="meta-item">
+                <i class="fas fa-star"></i>
+                <span>Độ khó: Trung bình</span>
               </div>
             </div>
           </div>
-          
-          <div nz-result-extra>
-            <button nz-button nzType="primary" (click)="restartTest()" class="restart-button">
-              <i class="fas fa-redo"></i>
-              もう一度テストを受ける
+
+          <!-- Action Templates -->
+          <ng-template #actionStart>
+            <button nz-button nzType="primary" nzSize="small" (click)="startExam(exam)" class="action-btn">
+              <i class="fas fa-play"></i>
+              Bắt đầu
             </button>
-            <button nz-button (click)="reviewAnswers()" class="review-button">
+          </ng-template>
+
+          <ng-template #actionDetails>
+            <button nz-button nzType="default" nzSize="small" (click)="viewDetails(exam)" class="action-btn">
               <i class="fas fa-eye"></i>
-              答えを確認する
+              Chi tiết
             </button>
-          </div>
-        </nz-result>
+          </ng-template>
+        </nz-card>
       </div>
     </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading() && examList().length === 0" class="empty-container">
+    <nz-empty [nzNotFoundImage]="'https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg'"
+      nzNotFoundContent="Không tìm thấy bài thi nào">
+      <button nz-button nzType="primary" (click)="loadExams()">
+        <i class="fas fa-refresh"></i>
+        Tải lại
+      </button>
+    </nz-empty>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading() && examList().length > 0" class="pagination-container">
+    
+  </div>
+</div>
