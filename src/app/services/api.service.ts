@@ -21,7 +21,7 @@ export class ApiService {
     username: string;
     password: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/crm/register`, payload);
+    return this.http.post(`${this.baseUrl}/user/register`, payload);
   }
 
   listTopics(page: number = 1, limit: number = 20) {
