@@ -20,7 +20,9 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ApiService } from '../../services/api.service';
+
 // exam.model.ts
 export interface ExamChoice {
   id?: number;
@@ -60,6 +62,25 @@ export interface ExamListResponse {
   };
 }
 
+export interface LessonItem {
+  id: number;
+  title: string;
+  lessonType: 'READING' | 'LISTENING';
+}
+
+export interface LessonListResponse {
+  status: boolean;
+  message: string;
+  httpCode: number;
+  data: {
+    list: LessonItem[];
+    num: number;
+    totalPage: number;
+    currentPage: number;
+  };
+  errorCode: string;
+}
+
 @Component({
   selector: 'app-exam-admin',
   standalone: true,
@@ -78,6 +99,7 @@ export interface ExamListResponse {
     NzSwitchModule,
     NzIconModule,
     NzPopconfirmModule,
+    NzSelectModule,
   ],
   templateUrl: './exam-admin.component.html',
   styleUrl: './exam-admin.component.scss',
@@ -88,6 +110,12 @@ export class ExamAdminComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   total = 0;
+
+  // Lesson data
+  readingLessons: LessonItem[] = [];
+  listeningLessons: LessonItem[] = [];
+  loadingReadings = false;
+  loadingListenings = false;
 
   // Modal states
   isModalVisible = false;
@@ -108,6 +136,8 @@ export class ExamAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadExams();
+    this.loadReadingLessons();
+    this.loadListeningLessons();
   }
 
   initForm(): FormGroup {
@@ -141,6 +171,34 @@ export class ExamAdminComponent implements OnInit {
       error: () => {
         this.message.error('Lỗi khi tải danh sách bài thi');
         this.loading = false;
+      },
+    });
+  }
+
+  loadReadingLessons(): void {
+    this.loadingReadings = true;
+    this.apiService.getReadings(10, 1).subscribe({
+      next: (response: LessonListResponse) => {
+        this.readingLessons = response.data.list;
+        this.loadingReadings = false;
+      },
+      error: () => {
+        this.message.error('Lỗi khi tải danh sách bài đọc');
+        this.loadingReadings = false;
+      },
+    });
+  }
+
+  loadListeningLessons(): void {
+    this.loadingListenings = true;
+    this.apiService.getListenings(10, 1).subscribe({
+      next: (response: LessonListResponse) => {
+        this.listeningLessons = response.data.list;
+        this.loadingListenings = false;
+      },
+      error: () => {
+        this.message.error('Lỗi khi tải danh sách bài nghe');
+        this.loadingListenings = false;
       },
     });
   }
@@ -189,8 +247,8 @@ export class ExamAdminComponent implements OnInit {
     this.examForm.patchValue({
       title: examData?.title,
       description: examData?.description,
-      readingIds: [],
-      listeningIds: [],
+      readingIds: examData?.readingIds || [],
+      listeningIds: examData?.listeningIds || [],
     });
 
     // Clear existing questions

@@ -11,7 +11,6 @@
       margin: 0;
       font-size: 24px;
       font-weight: 600;
-      color: #262626;
     }
 
     button {
@@ -32,13 +31,25 @@
       }
 
       .choice-item {
-        margin-bottom: 8px;
+        margin-bottom: 12px;
         padding: 8px;
+        border: 1px solid #f0f0f0;
+        border-radius: 6px;
         background-color: #fafafa;
-        border-radius: 4px;
 
-        &:last-child {
+        &:last-of-type {
+          margin-bottom: 16px;
+        }
+
+        nz-form-control {
           margin-bottom: 0;
+        }
+
+        button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 32px;
         }
       }
 
@@ -63,20 +74,120 @@
       }
     }
   }
-}
 
-// Responsive design
-@media (max-width: 768px) {
-  .exam-management {
+  // Responsive styles
+  @media (max-width: 768px) {
     padding: 16px;
 
-    .header {
+    .header-exam-management {
       flex-direction: column;
       align-items: flex-start;
       gap: 16px;
 
-      h2 {
-        font-size: 20px;
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  // Modal content styling
+  :host ::ng-deep {
+    .ant-modal-body {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .ant-select-multiple {
+      .ant-select-selector {
+        min-height: 40px;
+      }
+    }
+
+    .ant-card-small {
+      .ant-card-head {
+        min-height: 40px;
+        padding: 0 12px;
+
+        .ant-card-head-title {
+          padding: 8px 0;
+          font-size: 14px;
+          font-weight: 600;
+        }
+      }
+
+      .ant-card-body {
+        padding: 12px;
+      }
+    }
+
+    .ant-form-item {
+      margin-bottom: 16px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .ant-form-item-label {
+      > label {
+        font-weight: 500;
+        color: #262626;
+
+        &.ant-form-item-required {
+          &::before {
+            color: #ff4d4f;
+          }
+        }
+      }
+    }
+
+    .ant-input,
+    .ant-select-selector {
+      border-radius: 6px;
+
+      &:focus,
+      &:hover {
+        border-color: #1890ff;
+      }
+    }
+
+    .ant-btn {
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      &.ant-btn-dashed {
+        border-style: dashed;
+
+        &:hover {
+          border-color: #1890ff;
+          color: #1890ff;
+        }
+      }
+
+      &.ant-btn-link {
+        padding: 4px 8px;
+        height: auto;
+
+        i {
+          margin-right: 4px;
+        }
+      }
+    }
+
+    .ant-switch {
+      &.ant-switch-checked {
+        background-color: #52c41a;
+      }
+    }
+
+    // Loading states
+    .ant-select-loading {
+      .ant-select-arrow {
+        .anticon {
+          animation: ant-spin 1s infinite linear;
+        }
       }
     }
   }

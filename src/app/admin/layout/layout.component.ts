@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
@@ -14,6 +14,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { filter } from 'rxjs/operators';
+import { ApiService } from '../../services/api.service';
 
 interface MenuItemData {
   key: string;
@@ -53,6 +54,8 @@ interface BreadcrumbItem {
   styleUrls: ['./layout.component.scss'],
 })
 export class LayoutComponent implements OnInit {
+  private apiService = inject(ApiService);
+
   isCollapsed = false;
   selectedKeys: string[] = [];
   openKeys: string[] = [];
@@ -85,32 +88,11 @@ export class LayoutComponent implements OnInit {
           badge: 4,
         },
         {
-          key: 'lessons',
-          title: 'Bài học',
-          icon: 'fas fa-file-alt',
-          route: '/admin/lessons',
-          badge: 12,
-        },
-        {
           key: 'vocabulary',
           title: 'Từ vựng',
           icon: 'fas fa-language',
           route: '/admin/vocabulary',
           badge: 256,
-        },
-        {
-          key: 'grammar',
-          title: 'Ngữ pháp',
-          icon: 'fas fa-spell-check',
-          route: '/admin/grammar',
-          badge: 45,
-        },
-        {
-          key: 'kanji',
-          title: 'Kanji',
-          icon: 'fas fa-chinese',
-          route: '/admin/kanji',
-          badge: 89,
         },
       ],
     },
@@ -140,15 +122,11 @@ export class LayoutComponent implements OnInit {
           route: '/admin/exam',
           badge: 25,
         },
-        {
-          key: 'results',
-          title: 'Kết quả',
-          icon: 'fas fa-chart-line',
-          route: '/admin/results',
-        },
       ],
     },
   ];
+
+  countUser: any;
 
   constructor(private router: Router) {}
 
@@ -166,6 +144,14 @@ export class LayoutComponent implements OnInit {
 
     this.updateSelectedKeys(this.router.url);
     this.updateBreadcrumb(this.router.url);
+
+    this.apiService.getUsers(10, 1).subscribe({
+      next: (res: any) => {
+        this.countUser = res?.data.num;
+      },
+      error: () => {
+      },
+    });
   }
 
   toggleCollapsed(): void {

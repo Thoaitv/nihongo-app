@@ -65,6 +65,46 @@
                                 </nz-form-control>
                             </nz-form-item>
                         </div>
+                        <div nz-col [nzSpan]="12">
+                            <nz-form-item>
+                                <nz-form-label>Bài đọc</nz-form-label>
+                                <nz-form-control>
+                                    <nz-select 
+                                        formControlName="readingIds" 
+                                        nzPlaceHolder="Chọn bài đọc"
+                                        [nzLoading]="loadingReadings"
+                                        [nzDisabled]="isReadonly"
+                                        nzShowSearch
+                                        nzAllowClear>
+                                        <nz-option 
+                                            *ngFor="let reading of readingLessons" 
+                                            [nzLabel]="reading.title" 
+                                            [nzValue]="reading.id">
+                                        </nz-option>
+                                    </nz-select>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                        <div nz-col [nzSpan]="12">
+                            <nz-form-item>
+                                <nz-form-label>Bài nghe</nz-form-label>
+                                <nz-form-control>
+                                    <nz-select 
+                                        formControlName="listeningIds" 
+                                        nzPlaceHolder="Chọn bài nghe"
+                                        [nzLoading]="loadingListenings"
+                                        [nzDisabled]="isReadonly"
+                                        nzShowSearch
+                                        nzAllowClear>
+                                        <nz-option 
+                                            *ngFor="let listening of listeningLessons" 
+                                            [nzLabel]="listening.title" 
+                                            [nzValue]="listening.id">
+                                        </nz-option>
+                                    </nz-select>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
                     </div>
                 </nz-card>
 

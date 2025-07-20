@@ -1,0 +1,27 @@
+<h1>Quản lý người dùng</h1>
+<nz-table [nzData]="users" [nzLoading]="isLoading" [nzPageSize]="pageSize" [nzTotal]="totalItems"
+    [nzPageIndex]="pageIndex" [nzShowPagination]="true" [nzShowSizeChanger]="false"
+    (nzPageIndexChange)="onPageChange($event)" nzBordered nzSize="middle">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Trạng thái</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let user of users; let i = index">
+            <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
+            <td>{{ user.userName }}</td>
+            <td>{{ user.fullName }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <span class="status-badge" [ngClass]="{ active: !user.isActive, inactive: user.isActive }">
+                    {{ user.isActive ? 'Không hoạt động' : 'Hoạt động' }}
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</nz-table>
