@@ -81,9 +81,7 @@ export class ApiService {
 
   // EXAM
   getExams(limit: number = 10, page: number = 1): Observable<any> {
-    return this.http.get(
-      `${this.baseUrl}/exams?limit=${limit}&page=${page}`
-    );
+    return this.http.get(`${this.baseUrl}/exams?limit=${limit}&page=${page}`);
   }
 
   createExam(exam: any): Observable<any> {
@@ -96,5 +94,19 @@ export class ApiService {
 
   updateExam(id: number, exam: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/exam/${id}`, exam);
+  }
+
+  getUsers(limit: number, page: number): Observable<any> {
+    const params = { limit, page };
+    return this.http.get(`${this.baseUrl}/users`, { params });
+  }
+
+  getListenings(limit: number = 10, page: number = 1): Observable<any> {
+    return this.http.get<any>(
+      `${this.baseUrl}/listenings?limit=${limit}&page=${page}`
+    );
+  }
+   getReadings(limit: number = 10, page: number = 1): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/readings?limit=${limit}&page=${page}`);
   }
 }

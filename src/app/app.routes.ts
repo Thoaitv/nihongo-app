@@ -10,6 +10,7 @@ import { HomeComponent } from './student/home/home.component';
 import { LearnListeningComponent } from './student/learn-listening/learn-listening.component';
 import { LearnReadingComponent } from './student/learn-reading/learn-reading.component';
 import { ExamAdminComponent } from './admin/exam-admin/exam-admin.component';
+import { StudentsComponent } from './admin/students/students.component';
 
 export const routes: Routes = [
   {
@@ -28,7 +29,7 @@ export const routes: Routes = [
       { path: 'vocabulary', component: TuVungComponent },
       { path: 'topics', component: TopicsComponent },
       { path: 'exam', component: ExamAdminComponent },
-      // bạn có thể thêm các route admin khác ở đây
+      { path: 'students', component: StudentsComponent },
     ],
   },
   {
