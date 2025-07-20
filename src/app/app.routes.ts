@@ -14,6 +14,7 @@ import { StudentsComponent } from './admin/students/students.component';
 import { ReadingComponent } from './student/reading/reading.component';
 import { ReadingDetailComponent } from './student/reading/reading-detail/reading-detail.component';
 import { ExamDetailComponent } from './student/exam-student/exam-detail/exam-detail.component';
+import { ListeningDetailComponent } from './student/learn-listening/listening-detail/listening-detail.component';
 
 export const routes: Routes = [
   {
@@ -52,6 +53,7 @@ export const routes: Routes = [
       { path: 'home', component: HomeComponent },
       { path: 'tu-vung', component: LearnVocaComponent },
       { path: 'listening', component: LearnListeningComponent },
+      { path: 'listening/:id', component: ListeningDetailComponent },
       {
         path: 'reading',
         component: ReadingComponent,

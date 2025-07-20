@@ -1,0 +1,140 @@
+<div class="listening-quiz-container">
+    <!-- Loading Spinner -->
+    <div class="loading-container" *ngIf="loading">
+        <nz-spin nzSize="large" nzTip="Đang tải bài học...">
+            <div class="loading-content"></div>
+        </nz-spin>
+    </div>
+
+    <!-- Error State -->
+    <nz-alert *ngIf="error && !loading" nzType="error" [nzMessage]="'Lỗi tải dữ liệu'" [nzDescription]="error"
+        nzShowIcon class="error-alert">
+        <button nz-button nzType="primary" nzSize="small" (click)="retryLoad()" class="retry-button">
+            <i class="fas fa-redo"></i>
+            Thử lại
+        </button>
+    </nz-alert>
+
+    <!-- Main Content -->
+    <nz-card class="main-card" *ngIf="!loading && !error && listeningData">
+        <div nz-card-extra>
+            <button nz-button nzType="primary" nzSize="large" (click)="playAudio()"
+                [disabled]="!listeningData?.audioLink" class="listen-button">
+                <i class="fas fa-headphones"></i>
+                Nghe
+            </button>
+        </div>
+
+        <!-- Title Section -->
+        <div class="title-section">
+            <h2 class="lesson-title">{{ listeningData?.title }}</h2>
+            <div class="lesson-description" *ngIf="listeningData?.content">
+                <i class="fas fa-info-circle description-icon"></i>
+                <span>{{ listeningData.content }}</span>
+            </div>
+            <div class="lesson-type-badge">
+                <i class="fas fa-bookmark"></i>
+                <span>{{ getLessonTypeLabel(listeningData?.lessonType) }}</span>
+            </div>
+        </div>
+
+        <!-- Audio Section -->
+        <div class="audio-section">
+            <div class="audio-player" *ngIf="listeningData?.audioLink">
+                <div class="audio-info">
+                    <i class="fas fa-volume-up audio-icon"></i>
+                    <span class="audio-label">Bài nghe:</span>
+                </div>
+                <audio #audioPlayer controls class="audio-control">
+                    <source [src]="listeningData.audioLink" type="audio/mpeg">
+                    Trình duyệt của bạn không hỗ trợ audio.
+                </audio>
+            </div>
+
+            <!-- Fallback khi không có audio -->
+            <div class="no-audio-message" *ngIf="!listeningData?.audioLink">
+                <i class="fas fa-volume-mute"></i>
+                <span>Không có file âm thanh cho bài học này</span>
+            </div>
+        </div>
+
+        <!-- Jomaji Text -->
+        <div class="jomaji-section" *ngIf="listeningData?.jomaji">
+            <nz-typography>
+                <p nz-typography nz-text class="jomaji-text">{{ listeningData.jomaji }}</p>
+            </nz-typography>
+        </div>
+
+        <nz-divider></nz-divider>
+
+        <!-- Questions Section -->
+        <div class="questions-section">
+            <div class="question-card" *ngFor="let question of listeningData?.questionResponseDtos; let i = index">
+                <nz-card [nzTitle]="'Câu ' + (i + 1)" class="question-item" [ngClass]="{
+                'correct-answer': isSubmitted && isQuestionCorrect(question.id),
+                'incorrect-answer': isSubmitted && !isQuestionCorrect(question.id) && hasUserAnswer(question.id)
+              }">
+                    <p class="question-text">{{ question.questionText }}</p>
+
+                    <nz-radio-group [ngModel]="getUserAnswer(question.id)?.selectedChoiceId"
+                        (ngModelChange)="onAnswerChange(question.id, $event)" [disabled]="isSubmitted"
+                        class="choices-group">
+                        <div class="choice-item" *ngFor="let choice of question.questionChoiceResponseDtos" [ngClass]="{
+                    'correct-choice': isSubmitted && choice.correct,
+                    'incorrect-choice': isSubmitted && !choice.correct && getUserAnswer(question.id)?.selectedChoiceId === choice.id,
+                    'user-selected': getUserAnswer(question.id)?.selectedChoiceId === choice.id
+                  }">
+                            <label nz-radio [nzValue]="choice.id" class="choice-label">
+                                <span class="choice-code">{{ choice.selectChoiceCode }}.</span>
+                                <span class="choice-text">{{ choice.choiceText }}</span>
+                                <i *ngIf="isSubmitted && choice.correct"
+                                    class="fas fa-check choice-icon correct-icon"></i>
+                                <i *ngIf="isSubmitted && !choice.correct && getUserAnswer(question.id)?.selectedChoiceId === choice.id"
+                                    class="fas fa-times choice-icon incorrect-icon"></i>
+                            </label>
+                        </div>
+                    </nz-radio-group>
+
+                    <!-- Explanation shown after submission -->
+                    <nz-alert *ngIf="isSubmitted && hasUserAnswer(question.id)"
+                        [nzType]="isQuestionCorrect(question.id) ? 'success' : 'error'"
+                        [nzMessage]="getResultMessage(question)" [nzDescription]="question.explanation"
+                        [nzShowIcon]="true" class="explanation-alert">
+                    </nz-alert>
+                </nz-card>
+            </div>
+        </div>
+
+        <!-- Submit Section -->
+        <div class="submit-section">
+            <nz-space nzDirection="vertical" nzSize="large" class="submit-container">
+                <div class="submit-info" *ngIf="!isSubmitted">
+                    <i class="fas fa-info-circle info-icon"></i>
+                    <span>Vui lòng chọn đáp án cho tất cả câu hỏi trước khi kiểm tra</span>
+                </div>
+
+                <button nz-button nzType="primary" nzSize="large" (click)="submitQuiz()"
+                    [disabled]="!canSubmit() || isSubmitted" class="submit-button">
+                    <i class="fas fa-check-circle"></i>
+                    {{ isSubmitted ? 'Đã kiểm tra' : 'Kiểm tra kết quả' }}
+                </button>
+
+                <!-- Results Summary -->
+                <div class="results-summary" *ngIf="isSubmitted">
+                    <nz-card nzTitle="Kết quả bài làm" class="result-card">
+                        <div class="score-display">
+                            <div class="score-item correct-score">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Đúng: {{ getCorrectCount() }}/{{ getTotalQuestions() }}</span>
+                            </div>
+                            <div class="score-item accuracy-score">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Độ chính xác: {{ getAccuracyPercentage() }}%</span>
+                            </div>
+                        </div>
+                    </nz-card>
+                </div>
+            </nz-space>
+        </div>
+    </nz-card>
+</div>

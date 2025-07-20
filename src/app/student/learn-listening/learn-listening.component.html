@@ -1,216 +1,85 @@
 <div class="listening-container">
-    <!-- Header Section -->
     <div class="header-section">
         <div class="header-content">
-            <h1 class="page-title">
+            <div class="header-icon">
                 <i class="fas fa-headphones"></i>
-                日本語リスニング練習
-                <span class="subtitle">Japanese Listening Practice</span>
-            </h1>
-
-            <!-- Filters -->
-            <div class="filters-row">
-                <div class="filter-group">
-                    <label>Level:</label>
-                    <nz-select [(ngModel)]="selectedLevel" (ngModelChange)="onFilterChange()" nzPlaceHolder="All Levels"
-                        nzAllowClear>
-                        <nz-option nzValue="N5" nzLabel="N5 - Beginner"></nz-option>
-                        <nz-option nzValue="N4" nzLabel="N4 - Elementary"></nz-option>
-                        <nz-option nzValue="N3" nzLabel="N3 - Intermediate"></nz-option>
-                        <nz-option nzValue="N2" nzLabel="N2 - Upper Intermediate"></nz-option>
-                        <nz-option nzValue="N1" nzLabel="N1 - Advanced"></nz-option>
-                    </nz-select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Category:</label>
-                    <nz-select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()"
-                        nzPlaceHolder="All Categories" nzAllowClear>
-                        <nz-option nzValue="Daily Life" nzLabel="Daily Life"></nz-option>
-                        <nz-option nzValue="Business" nzLabel="Business"></nz-option>
-                        <nz-option nzValue="Travel" nzLabel="Travel"></nz-option>
-                        <nz-option nzValue="Culture" nzLabel="Culture"></nz-option>
-                        <nz-option nzValue="News" nzLabel="News"></nz-option>
-                    </nz-select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Duration:</label>
-                    <nz-slider [(ngModel)]="maxDuration" (ngModelChange)="onFilterChange()" [nzMin]="30" [nzMax]="600"
-                        [nzStep]="30" [nzTipFormatter]="formatDuration">
-                    </nz-slider>
-                </div>
             </div>
-
-            <!-- Search -->
-            <div class="search-section">
-                <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
-                    <input type="text" nz-input placeholder="Search lessons..." [(ngModel)]="searchTerm"
-                        (ngModelChange)="onSearchChange()" />
-                </nz-input-group>
-                <ng-template #suffixIconButton>
-                    <button nz-button nzType="primary" nzSearch>
-                        <i class="fas fa-search"></i>
-                    </button>
-                </ng-template>
+            <div class="header-text">
+                <h1 class="title">日本語聴解練習</h1>
+                <p class="subtitle">Japanese Listening Practice</p>
             </div>
         </div>
     </div>
 
-    <!-- Stats Section -->
-    <div class="stats-section">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-trophy"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-number">{{ completedLessons() }}</div>
-                <div class="stat-label">Completed</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-number">{{ totalStudyTime() }}h</div>
-                <div class="stat-label">Study Time</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-number">{{ averageScore() }}%</div>
-                <div class="stat-label">Average Score</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lessons Grid -->
-    <div class="lessons-grid">
-        <div *ngFor="let lesson of displayedLessons(); trackBy: trackByLessonId" class="lesson-card-wrapper"
-            [class.completed]="lesson.completed">
-            <nz-card class="lesson-card" [nzActions]="[playAction, transcriptAction, bookmarkAction]"
-                [nzCover]="coverTemplate">
-                <ng-template #coverTemplate>
-                    <div class="lesson-cover">
-                        <div class="level-badge" [class]="'level-' + lesson.level.toLowerCase()">
-                            {{ lesson.level }}
+    <div class="content-wrapper">
+        <nz-spin [nzSpinning]="loading" [nzSize]="'large'">
+            <div class="lessons-grid" *ngIf="!loading && lessons.length > 0">
+                <div class="lesson-card" *ngFor="let lesson of lessons; trackBy: trackByFn"
+                    (click)="selectLesson(lesson)">
+                    <div class="lesson-content">
+                        <div class="lesson-header">
+                            <div class="lesson-icon">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <div class="lesson-type">
+                                <nz-tag nzColor="blue">
+                                    <i class="fas fa-volume-up"></i>
+                                    {{ lesson.lessonType }}
+                                </nz-tag>
+                            </div>
                         </div>
-                        <div class="duration-badge">
-                            <i class="fas fa-clock"></i>
-                            {{ formatTime(lesson.duration) }}
+
+                        <div class="lesson-body">
+                            <h3 class="lesson-title">{{ lesson.title }}</h3>
+                            <div class="lesson-meta">
+                                <span class="lesson-id">
+                                    <i class="fas fa-hashtag"></i>
+                                    Lesson {{ lesson.id }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="difficulty-stars">
-                            <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
-                                [class.active]="star <= lesson.difficulty"></i>
+
+                        <div class="lesson-footer">
+                            <!-- <div class="action-buttons">
+                                <button nz-button nzType="primary" nzSize="small">
+                                    <i class="fas fa-play"></i>
+                                    開始学習
+                                </button>
+                                <button nz-button nzType="default" nzSize="small">
+                                    <i class="fas fa-info-circle"></i>
+                                    詳細
+                                </button>
+                            </div> -->
                         </div>
                     </div>
-                </ng-template>
 
-                <nz-card-meta [nzTitle]="titleTemplate" [nzDescription]="descriptionTemplate">
-                    <ng-template #titleTemplate>
-                        <div class="lesson-title">
-                            <h3>{{ lesson.title }}</h3>
-                            <p class="japanese-title">{{ lesson.titleJapanese }}</p>
+                    <div class="lesson-overlay">
+                        <div class="overlay-content">
+                            <i class="fas fa-play"></i>
+                            <span>Start Lesson</span>
                         </div>
-                    </ng-template>
+                    </div>
+                </div>
+            </div>
 
-                    <ng-template #descriptionTemplate>
-                        <div class="lesson-description">
-                            <p>{{ lesson.description }}</p>
-                            <div class="lesson-meta">
-                                <nz-tag [nzColor]="getCategoryColor(lesson.category)">
-                                    {{ lesson.category }}
-                                </nz-tag>
-                                <div class="tags">
-                                    <nz-tag *ngFor="let tag of lesson.tags" nzColor="blue">
-                                        {{ tag }}
-                                    </nz-tag>
-                                </div>
-                            </div>
-                            <div class="progress-section" *ngIf="lesson.progress > 0">
-                                <nz-progress [nzPercent]="lesson.progress" nzSize="small"
-                                    [nzStatus]="lesson.completed ? 'success' : 'active'"></nz-progress>
-                            </div>
-                        </div>
-                    </ng-template>
-                </nz-card-meta>
-
-                <ng-template #playAction>
-                    <button nz-button nzType="text" (click)="playLesson(lesson)"
-                        [nzLoading]="currentPlayingId === lesson.id && isPlaying">
-                        <i class="fas" [class.fa-play]="currentPlayingId !== lesson.id || !isPlaying"
-                            [class.fa-pause]="currentPlayingId === lesson.id && isPlaying"></i>
-                    </button>
-                </ng-template>
-
-                <ng-template #transcriptAction>
-                    <button nz-button nzType="text" (click)="showTranscript(lesson)">
-                        <i class="fas fa-file-text"></i>
-                    </button>
-                </ng-template>
-
-                <ng-template #bookmarkAction>
-                    <button nz-button nzType="text" (click)="toggleBookmark(lesson)">
-                        <i class="fas fa-bookmark" [class.bookmarked]="lesson.completed"></i>
-                    </button>
-                </ng-template>
-            </nz-card>
-        </div>
-    </div>
-
-    <!-- Loading Indicator -->
-    <div class="loading-section" *ngIf="isLoading">
-        <nz-spin nzSize="large">
-            <div class="loading-text">Loading more lessons...</div>
+            <div class="empty-state" *ngIf="!loading && lessons.length === 0">
+                <div class="empty-content">
+                    <i class="fas fa-music"></i>
+                    <h3>No Listening Lessons Found</h3>
+                    <p>There are no listening lessons available at the moment.</p>
+                </div>
+            </div>
         </nz-spin>
-    </div>
 
-    <!-- Audio Player -->
-    <div class="audio-player" *ngIf="currentLesson" [class.active]="isPlaying">
-        <div class="player-info">
-            <div class="lesson-info">
-                <!-- <h4>{{ currentLesson.title }}</h4>
-                <p>{{ currentLesson.titleJapanese }}</p> -->
-            </div>
-            <div class="player-controls">
-                <button nz-button nzType="text" (click)="togglePlayback()">
-                    <i class="fas" [class.fa-play]="!isPlaying" [class.fa-pause]="isPlaying"></i>
-                </button>
-                <button nz-button nzType="text" (click)="changeSpeed()">
-                    <i class="fas fa-tachometer-alt"></i>
-                    {{ playbackSpeed }}x
-                </button>
-                <button nz-button nzType="text" (click)="toggleLoop()">
-                    <i class="fas fa-redo" [class.active]="isLooping"></i>
-                </button>
-            </div>
-        </div>
-        <div class="progress-bar">
-            <div class="progress-fill" [style.width.%]="audioProgress"></div>
+        <div class="pagination-section" *ngIf="totalPages > 1">
+            <nz-pagination [nzTotal]="totalLessons" [nzPageSize]="pageSize"
+                [nzShowSizeChanger]="true" [nzShowQuickJumper]="true" [nzShowTotal]="totalTemplate"
+                (nzPageIndexChange)="onPageChange($event)" (nzPageSizeChange)="onPageSizeChange($event)">
+            </nz-pagination>
+
+            <ng-template #totalTemplate let-total let-range="range">
+                {{ range[0] }}-{{ range[1] }} of {{ total }} lessons
+            </ng-template>
         </div>
     </div>
-
-    <!-- Transcript Modal -->
-    <nz-modal [(nzVisible)]="isTranscriptVisible" nzTitle="Transcript" nzWidth="80%" nzCentered
-        (nzOnCancel)="closeTranscript()" [nzFooter]="null">
-        <div class="transcript-content" *nzModalContent>
-            <div class="transcript-tabs">
-                <button nz-button [nzType]="showJapanese ? 'default' : 'primary'" (click)="showJapanese = false">
-                    English
-                </button>
-                <button nz-button [nzType]="showJapanese ? 'primary' : 'default'" (click)="showJapanese = true">
-                    日本語
-                </button>
-            </div>
-            <div class="transcript-text" [class.japanese]="showJapanese">
-                {{ showJapanese ? selectedLesson?.transcriptJapanese : selectedLesson?.transcript }}
-            </div>
-        </div>
-    </nz-modal>
 </div>
