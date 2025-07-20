@@ -11,6 +11,9 @@ import { LearnListeningComponent } from './student/learn-listening/learn-listeni
 import { LearnReadingComponent } from './student/learn-reading/learn-reading.component';
 import { ExamAdminComponent } from './admin/exam-admin/exam-admin.component';
 import { StudentsComponent } from './admin/students/students.component';
+import { ReadingComponent } from './student/reading/reading.component';
+import { ReadingDetailComponent } from './student/reading/reading-detail/reading-detail.component';
+import { ExamDetailComponent } from './student/exam-student/exam-detail/exam-detail.component';
 
 export const routes: Routes = [
   {
@@ -24,7 +27,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    component: LayoutComponent, 
+    component: LayoutComponent,
     children: [
       { path: 'vocabulary', component: TuVungComponent },
       { path: 'topics', component: TopicsComponent },
@@ -36,11 +39,29 @@ export const routes: Routes = [
     path: 'student',
     component: LayoutStudentComponent,
     children: [
-      { path: 'exam', component: ExamStudentComponent },
+      {
+        path: 'exam',
+        component: ExamStudentComponent,
+        title: 'Danh sách exam',
+      },
+      {
+        path: 'exam/:id',
+        component: ExamDetailComponent,
+        title: 'Chi tiết exam',
+      },
       { path: 'home', component: HomeComponent },
       { path: 'tu-vung', component: LearnVocaComponent },
       { path: 'listening', component: LearnListeningComponent },
-      { path: 'reading', component: LearnReadingComponent },
+      {
+        path: 'reading',
+        component: ReadingComponent,
+        title: 'Danh sách bài đọc',
+      },
+      {
+        path: 'reading/:id',
+        component: ReadingDetailComponent,
+        title: 'Chi tiết bài đọc',
+      },
     ],
   },
   {

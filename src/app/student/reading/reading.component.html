@@ -1,0 +1,130 @@
+<div class="reading-list-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1>
+                    <i class="fas fa-book-reader"></i>
+                    Danh Sách Bài Đọc
+                </h1>
+                <p class="subtitle">Luyện tập kỹ năng đọc hiểu tiếng Nhật</p>
+            </div>
+            <div class="stats-section">
+                <div class="stat-item">
+                    <span class="stat-number">{{ totalReadings }}</span>
+                    <span class="stat-label">Tổng bài đọc</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <nz-card class="filter-card" nzSize="small">
+        <div class="filter-content">
+            <div class="search-section">
+                <nz-input-group nzPrefixIcon="search" nzSize="large">
+                    <input type="text" nz-input placeholder="Tìm kiếm bài đọc..." [(ngModel)]="searchTerm"
+                        (input)="onSearchChange($event)" />
+                </nz-input-group>
+            </div>
+            <div class="filter-actions">
+                <nz-select nzPlaceHolder="Sắp xếp theo" nzSize="large" [(ngModel)]="sortBy"
+                    (ngModelChange)="onSortChange()">
+                    <nz-option nzValue="newest" nzLabel="Mới nhất"></nz-option>
+                    <nz-option nzValue="oldest" nzLabel="Cũ nhất"></nz-option>
+                    <nz-option nzValue="title" nzLabel="Theo tên"></nz-option>
+                </nz-select>
+            </div>
+        </div>
+    </nz-card>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+        <nz-spin nzSize="large" nzTip="Đang tải danh sách bài đọc...">
+            <div class="loading-placeholder"></div>
+        </nz-spin>
+    </div>
+
+    <!-- Reading List -->
+    <div class="readings-grid" *ngIf="!loading && readingList.length > 0">
+        <div nz-col *ngFor="let reading of readingList; let i = index"
+            class="reading-col">
+
+            <nz-card class="reading-card" [class.featured]="i === 0" nzHoverable
+                (click)="navigateToReading(reading.id)">
+
+                <div class="card-header">
+                    <div class="reading-number">
+                        <i class="fas fa-bookmark"></i>
+                        #{{ reading.id }}
+                    </div>
+                    <nz-tag nzColor="blue" class="lesson-type-tag">
+                        <i class="fas fa-book-open"></i>
+                        {{ getLessonTypeLabel(reading.lessonType) }}
+                    </nz-tag>
+                </div>
+
+                <div class="card-content">
+                    <h3 class="reading-title" [title]="reading.title">
+                        {{ reading.title }}
+                    </h3>
+
+                    <div class="reading-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>~15 phút</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Trắc nghiệm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button nz-button nzType="primary" nzBlock nzSize="large"
+                        (click)="navigateToReading(reading.id); $event.stopPropagation()">
+                        <i class="fas fa-play"></i>
+                        Bắt đầu làm bài
+                    </button>
+                </div>
+
+                <div class="card-overlay" *ngIf="i === 0">
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i>
+                        Nổi bật
+                    </div>
+                </div>
+            </nz-card>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-container" *ngIf="!loading && readingList.length === 0">
+        <nz-empty nzNotFoundImage="simple" [nzNotFoundContent]="emptyTemplate">
+        </nz-empty>
+
+        <ng-template #emptyTemplate>
+            <div class="empty-content">
+                <h3>Không tìm thấy bài đọc</h3>
+                <p>{{ searchTerm ? 'Thử tìm kiếm với từ khóa khác' : 'Hiện tại chưa có bài đọc nào' }}</p>
+                <button nz-button nzType="primary" (click)="resetFilters()" *ngIf="searchTerm">
+                    <i class="fas fa-refresh"></i>
+                    Xóa bộ lọc
+                </button>
+            </div>
+        </ng-template>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="!loading && totalPages > 1">
+        <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="totalReadings" [nzPageSize]="pageSize" nzShowSizeChanger
+            nzShowQuickJumper [nzShowTotal]="totalTemplate" (nzPageIndexChange)="onPageChange($event)"
+            (nzPageSizeChange)="onPageSizeChange($event)">
+        </nz-pagination>
+
+        <ng-template #totalTemplate let-total let-range="range">
+            Hiển thị {{ range[0] }}-{{ range[1] }} trong tổng số {{ total }} bài đọc
+        </ng-template>
+    </div>
+</div>

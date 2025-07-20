@@ -1,0 +1,147 @@
+<!-- Loading State -->
+<div *ngIf="loading" class="text-center p-4">
+  <nz-spin nzSize="large" nzTip="Đang tải bài đọc...">
+    <div style="height: 300px;"></div>
+  </nz-spin>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error && !loading" class="text-center p-4">
+  <nz-alert
+    [nzMessage]="error"
+    nzType="error"
+    nzShowIcon
+    class="mb-3">
+  </nz-alert>
+  <button nz-button nzType="primary" (click)="retryLoad()">
+    <i class="fas fa-redo"></i>
+    Thử lại
+  </button>
+</div>
+
+<!-- Main Content -->
+<div class="reading-container" *ngIf="readingData && !loading && !error">
+    <!-- Header -->
+    <div class="reading-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1 nz-typography>
+                    <i class="fas fa-book-open"></i>
+                    {{ readingData.title }}
+                </h1>
+                <nz-tag nzColor="blue">
+                    <i class="fas fa-language"></i>
+                    Bài đọc tiếng Nhật
+                </nz-tag>
+            </div>
+            <div class="progress-section">
+                <span>Tiến độ: {{ answeredCount }}/{{ totalQuestions }}</span>
+                <nz-progress [nzPercent]="progressPercent" nzStatus="active" [nzShowInfo]="false">
+                </nz-progress>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reading Content -->
+    <nz-card class="reading-content-card" nzTitle="Nội dung bài đọc">
+        <div class="content-section">
+            <div class="japanese-content" *ngIf="readingData.content">
+                <h3><i class="fas fa-yen-sign"></i> Tiếng Nhật:</h3>
+                <p class="japanese-text">{{ readingData.content }}</p>
+            </div>
+
+            <div class="romaji-content">
+                <h3><i class="fas fa-font"></i> Romaji (Phiên âm):</h3>
+                <p class="romaji-text">{{ readingData.jomaji }}</p>
+            </div>
+
+            <div class="audio-section" *ngIf="readingData.audioLink">
+                <audio controls class="w-100">
+                    <source [src]="readingData.audioLink" type="audio/mpeg">
+                    Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                </audio>
+                <button nz-button nzType="primary" nzShape="round" class="mt-2">
+                    <i class="fas fa-play"></i>
+                    Nghe audio
+                </button>
+            </div>
+        </div>
+    </nz-card>
+
+    <nz-divider></nz-divider>
+
+    <!-- Questions Section -->
+    <div class="questions-section">
+        <h2 nz-typography>
+            <i class="fas fa-question-circle"></i>
+            Câu hỏi trắc nghiệm
+        </h2>
+
+        <div class="question-list">
+            <nz-card *ngFor="let question of readingData.questionResponseDtos; let i = index" class="question-card"
+                [class.answered]="question.isAnswered" [class.correct]="question.isCorrect"
+                [class.incorrect]="question.isAnswered && !question.isCorrect">
+
+                <div class="question-header">
+                    <h3>
+                        <span class="question-number">Câu {{ i + 1 }}:</span>
+                        {{ question.questionText }}
+                    </h3>
+                    <div class="question-status" *ngIf="question.isAnswered">
+                        <nz-tag [nzColor]="question.isCorrect ? 'success' : 'error'">
+                            <i [class]="question.isCorrect ? 'fas fa-check' : 'fas fa-times'"></i>
+                            {{ question.isCorrect ? 'Đúng' : 'Sai' }}
+                        </nz-tag>
+                    </div>
+                </div>
+
+                <nz-radio-group [(ngModel)]="question.selectedAnswer" class="choices-group"
+                    [nzDisabled]="question.isAnswered">
+
+                    <div *ngFor="let choice of question.questionChoiceResponseDtos" class="choice-item"
+                        [class.correct-choice]="question.isAnswered && choice.correct"
+                        [class.selected-wrong]="question.isAnswered && question.selectedAnswer === choice.selectChoiceCode && !choice.correct">
+
+                        <label nz-radio [nzValue]="choice.selectChoiceCode">
+                            <span class="choice-code">{{ choice.selectChoiceCode }}.</span>
+                            {{ choice.choiceText }}
+                            <i *ngIf="question.isAnswered && choice.correct"
+                                class="fas fa-check-circle correct-icon"></i>
+                            <i *ngIf="question.isAnswered && question.selectedAnswer === choice.selectChoiceCode && !choice.correct"
+                                class="fas fa-times-circle incorrect-icon"></i>
+                        </label>
+                    </div>
+                </nz-radio-group>
+
+                <div class="question-actions">
+                    <button nz-button *ngIf="!question.isAnswered && question.selectedAnswer" nzType="primary"
+                        (click)="submitAnswer(question)">
+                        <i class="fas fa-paper-plane"></i>
+                        Trả lời
+                    </button>
+                </div>
+
+                <nz-alert *ngIf="question.isAnswered" [nzType]="question.isCorrect ? 'success' : 'error'"
+                    [nzMessage]="question.isCorrect ? 'Chính xác!' : 'Chưa chính xác'"
+                    [nzDescription]="question.explanation" nzShowIcon class="explanation-alert">
+                </nz-alert>
+            </nz-card>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div class="result-section" *ngIf="isCompleted">
+        <nz-result [nzStatus]="getResultStatus()" [nzTitle]="getResultTitle()" [nzSubTitle]="getResultSubtitle()">
+            <div nz-result-extra>
+                <button nz-button nzType="primary" nzSize="large" routerLink="/student/reading">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay về danh sách
+                </button>
+                <button nz-button nzSize="large" (click)="retryLoad()">
+                    <i class="fas fa-redo"></i>
+                    Làm lại
+                </button>
+            </div>
+        </nz-result>
+    </div>
+</div>
