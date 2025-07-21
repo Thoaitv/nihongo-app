@@ -106,7 +106,7 @@ export class ReadingDetailComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    const apiUrl = `${environment}/reading/${readingId}/answer`;
+    const apiUrl = `${environment.apiUrl}/reading/${readingId}/answer`;
     
     this.http.get<any>(apiUrl).subscribe({
       next: (response) => {

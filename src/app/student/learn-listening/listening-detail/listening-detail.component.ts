@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -12,6 +12,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { HttpClient } from '@angular/common/http';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { environment } from '../../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
 interface QuestionChoice {
   id: number;
   choiceText: string;
@@ -66,13 +67,18 @@ export class ListeningDetailComponent implements OnInit {
   isSubmitted = false;
   loading = false;
   error: any | null = null;
-
-
+  isPlayingAudio: number | null = null;
+  private route = inject(ActivatedRoute);
 
   constructor(private message: NzMessageService, private http: HttpClient) {}
 
-  ngOnInit() {
-    this.loadListeningData(3); // ID mặc định là 3, có thể thay đổi hoặc nhận từ route params
+  ngOnInit(): void {
+    this.route.params.subscribe((params) => {
+      const vocal = params['id'];
+      if (vocal) {
+        this.loadListeningData(vocal); // ID mặc định là 3, có thể thay đổi hoặc nhận từ route params
+      }
+    });
   }
   getLessonTypeLabel(lessonType: string | undefined): string {
     switch (lessonType) {
@@ -93,19 +99,43 @@ export class ListeningDetailComponent implements OnInit {
     this.loadListeningData(3); // Retry với cùng lesson ID
   }
 
-  playAudio() {
-    const audioElement = document.querySelector('audio') as HTMLAudioElement;
-    if (audioElement) {
-      if (audioElement.paused) {
-        audioElement.play();
-        this.message.info('Đang phát audio...');
-      } else {
-        audioElement.pause();
-        this.message.info('Đã tạm dừng audio');
-      }
-    } else {
-      this.message.warning('Không tìm thấy file audio');
+  // playAudio() {
+  //   const audioElement = document.querySelector('audio') as HTMLAudioElement;
+  //   if (audioElement) {
+  //     if (audioElement.paused) {
+  //       audioElement.play();
+  //       this.message.info('Đang phát audio...');
+  //     } else {
+  //       audioElement.pause();
+  //       this.message.info('Đã tạm dừng audio');
+  //     }
+  //   } else {
+  //     this.message.warning('Không tìm thấy file audio');
+  //   }
+  // }
+
+  playAudio(data: any): void {
+    const jomaji = data?.jomaji;
+
+    if (!jomaji) {
+      console.error('Không có nội dung jomaji để phát.');
+      return;
     }
+
+    const utterance = new SpeechSynthesisUtterance(jomaji);
+
+    // Lấy danh sách giọng nói có hỗ trợ tiếng Nhật
+    const voices = window.speechSynthesis.getVoices();
+    const japaneseVoice = voices.find((voice) => voice.lang.startsWith('ja'));
+
+    if (japaneseVoice) {
+      utterance.voice = japaneseVoice;
+    } else {
+      console.warn('Không tìm thấy giọng nói tiếng Nhật. Dùng giọng mặc định.');
+    }
+
+    // Phát âm
+    speechSynthesis.speak(utterance);
   }
 
   loadListeningData(lessonId: number) {

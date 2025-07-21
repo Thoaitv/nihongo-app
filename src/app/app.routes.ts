@@ -8,7 +8,6 @@ import { ExamStudentComponent } from './student/exam-student/exam-student.compon
 import { LearnVocaComponent } from './student/learn-voca/learn-voca.component';
 import { HomeComponent } from './student/home/home.component';
 import { LearnListeningComponent } from './student/learn-listening/learn-listening.component';
-import { LearnReadingComponent } from './student/learn-reading/learn-reading.component';
 import { ExamAdminComponent } from './admin/exam-admin/exam-admin.component';
 import { StudentsComponent } from './admin/students/students.component';
 import { ReadingComponent } from './student/reading/reading.component';
@@ -16,6 +15,8 @@ import { ReadingDetailComponent } from './student/reading/reading-detail/reading
 import { ExamDetailComponent } from './student/exam-student/exam-detail/exam-detail.component';
 import { ListeningDetailComponent } from './student/learn-listening/listening-detail/listening-detail.component';
 import { VocaDetailComponent } from './student/learn-voca/voca-detail/voca-detail.component';
+import { ListeningComponent } from './admin/listening/listening.component';
+import { ReadingAdminComponent } from './admin/reading/reading.component';
 
 export const routes: Routes = [
   {
@@ -35,6 +36,8 @@ export const routes: Routes = [
       { path: 'topics', component: TopicsComponent },
       { path: 'exam', component: ExamAdminComponent },
       { path: 'students', component: StudentsComponent },
+      { path: 'listening', component: ListeningComponent },
+      { path: 'reading', component: ReadingAdminComponent },
     ],
   },
   {

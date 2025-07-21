@@ -94,6 +94,20 @@ export class LayoutComponent implements OnInit {
           route: '/admin/vocabulary',
           badge: 256,
         },
+        {
+          key: 'listening',
+          title: 'Bài nghe',
+          icon: 'fas fa-language',
+          route: '/admin/listening',
+          badge: 256,
+        },
+        {
+          key: 'reading',
+          title: 'Bài đọc',
+          icon: 'fas fa-language',
+          route: '/admin/reading',
+          badge: 256,
+        },
       ],
     },
     {

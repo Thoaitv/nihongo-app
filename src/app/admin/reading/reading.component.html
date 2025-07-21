@@ -1,0 +1,243 @@
+<div class="listening-management">
+    <!-- Header -->
+    <div class="header-listening">
+        <h2 class="title">
+            <i class="fas fa-headphones"></i>
+            Quản lý Bài Đọc Tiếng Nhật
+        </h2>
+        <button nz-button nzType="primary" nzSize="large" (click)="showCreateModal()">
+            <i class="fas fa-plus"></i>
+            Thêm Bài Đọc Mới
+        </button>
+    </div>
+
+    <!-- Table -->
+    <nz-card class="table-card">
+        <nz-table #basicTable [nzData]="listeningList" [nzLoading]="loading" [nzShowPagination]="false" nzSize="middle"
+            class="listening-table">
+            <thead>
+                <tr>
+                    <th nzWidth="80px">ID</th>
+                    <th>Tiêu đề</th>
+                    <th nzWidth="120px">Loại bài</th>
+                    <th nzWidth="150px">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of listeningList">
+                    <td>{{ item.id }}</td>
+                    <td>
+                        <span class="title-text">{{ item.title }}</span>
+                    </td>
+                    <td>
+                        <nz-tag [nzColor]="item.lessonType === 'LISTENING' ? 'blue' : 'green'">
+                            <i class="fas" [class.fa-headphones]="item.lessonType === 'LISTENING'"
+                                [class.fa-book]="item.lessonType === 'READING'"></i>
+                            {{ item.lessonType }}
+                        </nz-tag>
+                    </td>
+                    <td>
+                        <nz-space>
+                            <button *nzSpaceItem nz-button nzSize="small" nzType="primary"
+                                (click)="viewDetail(item.id)">
+                                <i class="fas fa-eye"></i>
+                                Chi tiết
+                            </button>
+                        </nz-space>
+                    </td>
+                </tr>
+            </tbody>
+        </nz-table>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper">
+            <nz-pagination [nzPageIndex]="pageIndex" [nzTotal]="total" [nzPageSize]="pageSize"
+          (nzPageIndexChange)="onPageChange($event)"
+                >
+            </nz-pagination>
+        </div>
+    </nz-card>
+
+    <!-- Create Modal -->
+    <nz-modal [(nzVisible)]="isCreateModalVisible" nzTitle="Tạo Bài Đọc Mới" [nzOkText]="'Tạo Bài Đọc'"
+        [nzCancelText]="'Hủy'" [nzWidth]="800" (nzOnCancel)="handleCreateCancel()" (nzOnOk)="handleCreateOk()"
+        nzOkType="primary" class="create-modal">
+
+        <ng-container *nzModalContent>
+            <form nz-form [formGroup]="createForm" nzLayout="vertical" class="create-form">
+                <!-- Basic Info -->
+                <div class="form-section">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Tiêu đề</nz-form-label>
+                        <nz-form-control nzErrorTip="Vui lòng nhập tiêu đề">
+                            <input nz-input formControlName="title" placeholder="Nhập tiêu đề bài Đọc..." />
+                        </nz-form-control>
+                    </nz-form-item>
+
+                    <nz-form-item>
+                        <nz-form-label>Nội dung</nz-form-label>
+                        <nz-form-control>
+                            <textarea nz-input formControlName="content" placeholder="Nhập nội dung bài Đọc..."
+                                [nzAutosize]="{ minRows: 3, maxRows: 6 }"></textarea>
+                        </nz-form-control>
+                    </nz-form-item>
+
+                    <nz-form-item>
+                        <nz-form-label>Jomaji</nz-form-label>
+                        <nz-form-control>
+                            <textarea nz-input formControlName="jomaji" placeholder="Nhập phiên âm jomaji..."
+                                [nzAutosize]="{ minRows: 2, maxRows: 4 }"></textarea>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <nz-divider></nz-divider>
+
+                <!-- Questions -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-question-circle"></i>
+                            Câu hỏi ({{ questionsArray.length }})
+                        </h3>
+                        <button type="button" nz-button nzType="dashed" (click)="addQuestion()">
+                            <i class="fas fa-plus"></i>
+                            Thêm câu hỏi
+                        </button>
+                    </div>
+
+                    <div formArrayName="questionRequestDtos" class="questions-container">
+                        <nz-collapse nzGhost>
+                            <nz-collapse-panel *ngFor="let question of questionsArray.controls; let i = index"
+                                [nzHeader]="'Câu hỏi ' + (i + 1)" [nzActive]="true" class="question-panel">
+
+                                <ng-container [formGroupName]="i">
+                                    <div class="question-header">
+                                        <span class="question-number">Câu {{ i + 1 }}</span>
+                                        <button type="button" nz-button nzType="text" nzDanger
+                                            (click)="removeQuestion(i)" *ngIf="questionsArray.length > 1">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <nz-form-item>
+                                        <nz-form-label nzRequired>Câu hỏi</nz-form-label>
+                                        <nz-form-control nzErrorTip="Vui lòng nhập câu hỏi">
+                                            <textarea nz-input formControlName="questionText"
+                                                placeholder="Nhập nội dung câu hỏi..."
+                                                [nzAutosize]="{ minRows: 2, maxRows: 4 }"></textarea>
+                                        </nz-form-control>
+                                    </nz-form-item>
+
+                                    <nz-form-item>
+                                        <nz-form-label>Giải thích</nz-form-label>
+                                        <nz-form-control>
+                                            <textarea nz-input formControlName="explanation"
+                                                placeholder="Nhập giải thích cho câu hỏi..."
+                                                [nzAutosize]="{ minRows: 2, maxRows: 3 }"></textarea>
+                                        </nz-form-control>
+                                    </nz-form-item>
+
+                                    <!-- Choices -->
+                                    <div class="choices-section">
+                                        <h4 class="choices-title">Các lựa chọn</h4>
+                                        <div formArrayName="questionChoicesRequestDtos" class="choices-container">
+                                            <div *ngFor="let choice of getChoicesArray(i).controls; let j = index"
+                                                [formGroupName]="j" class="choice-item">
+                                                <div class="choice-content d-flex" style="gap: 20px;">
+                                                    <div class="choice-label">{{ ['A', 'B', 'C', 'D'][j] }}</div>
+                                                    <nz-form-item class="choice-input">
+                                                        <nz-form-control>
+                                                            <input nz-input formControlName="choiceText"
+                                                                [placeholder]="'Nhập lựa chọn ' + ['A', 'B', 'C', 'D'][j] + '...'" />
+                                                        </nz-form-control>
+                                                    </nz-form-item>
+                                                    <div class="choice-correct">
+                                                        <radio nz-checkbox formControlName="correct">Đáp án đúng</radio>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </nz-collapse-panel>
+                        </nz-collapse>
+                    </div>
+                </div>
+            </form>
+        </ng-container>
+    </nz-modal>
+
+    <!-- Detail Modal -->
+    <nz-modal [(nzVisible)]="isDetailModalVisible" [nzTitle]="'Chi tiết: ' + (selectedListening?.title || '')"
+        [nzFooter]="null" [nzWidth]="900" (nzOnCancel)="handleDetailCancel()" class="detail-modal">
+
+        <ng-container *nzModalContent>
+            <div *ngIf="selectedListening" class="detail-content">
+                <!-- Basic Info -->
+                <nz-card nzTitle="Thông tin cơ bản" class="detail-card">
+                    <div class="detail-item">
+                        <span class="label">ID:</span>
+                        <span class="value">{{ selectedListening.id }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Tiêu đề:</span>
+                        <span class="value">{{ selectedListening.title }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Loại bài:</span>
+                        <nz-tag [nzColor]="selectedListening.lessonType === 'LISTENING' ? 'blue' : 'green'">
+                            {{ selectedListening.lessonType }}
+                        </nz-tag>
+                    </div>
+                    <div class="detail-item" *ngIf="selectedListening.content">
+                        <span class="label">Nội dung:</span>
+                        <div class="value content-text">{{ selectedListening.content }}</div>
+                    </div>
+                    <div class="detail-item" *ngIf="selectedListening.jomaji">
+                        <span class="label">Jomaji:</span>
+                        <div class="value jomaji-text">{{ selectedListening.jomaji }}</div>
+                    </div>
+                    <div class="detail-item" *ngIf="selectedListening.audioLink">
+                        <span class="label">Link âm thanh:</span>
+                        <a class="value" [href]="selectedListening.audioLink" target="_blank">
+                            {{ selectedListening.audioLink }}
+                        </a>
+                    </div>
+                </nz-card>
+
+                <!-- Questions -->
+                <nz-card nzTitle="Câu hỏi" class="questions-card"
+                    *ngIf="selectedListening.questionResponseDtos.length > 0">
+                    <div *ngFor="let question of selectedListening.questionResponseDtos; let i = index"
+                        class="question-detail">
+                        <div class="question-header">
+                            <h4>Câu {{ i + 1 }}</h4>
+                        </div>
+
+                        <div class="question-content">
+                            <div class="question-text">
+                                <strong>Câu hỏi:</strong> {{ question.questionText }}
+                            </div>
+                            <div class="explanation" *ngIf="question.explanation">
+                                <strong>Giải thích:</strong> {{ question.explanation }}
+                            </div>
+
+                            <div class="choices">
+                                <div *ngFor="let choice of question.questionChoiceResponseDtos" class="choice-detail"
+                                    [class.correct]="choice.correct">
+                                    <div class="choice-label">{{ choice.selectChoiceCode }}</div>
+                                    <div class="choice-text">{{ choice.choiceText }}</div>
+                                    <div class="choice-status" *ngIf="choice.correct">
+                                        <i class="fas fa-check"></i>
+                                        Đáp án đúng
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nz-card>
+            </div>
+        </ng-container>
+    </nz-modal>
+</div>

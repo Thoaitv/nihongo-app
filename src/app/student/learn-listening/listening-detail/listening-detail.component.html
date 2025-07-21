@@ -18,8 +18,7 @@
     <!-- Main Content -->
     <nz-card class="main-card" *ngIf="!loading && !error && listeningData">
         <div nz-card-extra>
-            <button nz-button nzType="primary" nzSize="large" (click)="playAudio()"
-                [disabled]="!listeningData?.audioLink" class="listen-button">
+            <button nz-button nzType="primary" nzSize="large" (click)="playAudio(listeningData)" class="listen-button">
                 <i class="fas fa-headphones"></i>
                 Nghe
             </button>
@@ -39,7 +38,7 @@
         </div>
 
         <!-- Audio Section -->
-        <div class="audio-section">
+        <!-- <div class="audio-section">
             <div class="audio-player" *ngIf="listeningData?.audioLink">
                 <div class="audio-info">
                     <i class="fas fa-volume-up audio-icon"></i>
@@ -51,12 +50,11 @@
                 </audio>
             </div>
 
-            <!-- Fallback khi không có audio -->
             <div class="no-audio-message" *ngIf="!listeningData?.audioLink">
                 <i class="fas fa-volume-mute"></i>
                 <span>Không có file âm thanh cho bài học này</span>
             </div>
-        </div>
+        </div> -->
 
         <!-- Jomaji Text -->
         <div class="jomaji-section" *ngIf="listeningData?.jomaji">

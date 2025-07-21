@@ -64,7 +64,7 @@ export class VocaDetailComponent implements OnInit {
     this.route.params.subscribe((params) => {
       const vocal = params['id'];
       if (vocal) {
-         this.topicId = vocal;
+        this.topicId = vocal;
         this.loadVocabulary();
       }
     });
@@ -75,7 +75,7 @@ export class VocaDetailComponent implements OnInit {
 
     this.loading = true;
     const url = `${environment.apiUrl}/vocabularies?limit=${this.pageSize}&page=${this.currentPage}&topicId=${this.topicId}`;
-    
+
     this.http.get<any>(url).subscribe({
       next: (response) => {
         if (response.status && response.data) {
@@ -88,9 +88,11 @@ export class VocaDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading vocabulary:', error);
-        this.message.error('Không thể tải danh sách từ vựng. Vui lòng thử lại!');
+        this.message.error(
+          'Không thể tải danh sách từ vựng. Vui lòng thử lại!'
+        );
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -98,41 +100,41 @@ export class VocaDetailComponent implements OnInit {
     if (this.isPlayingAudio === vocab.id) return;
 
     this.isPlayingAudio = vocab.id;
-    
-    // Tạo audio element để phát âm
-    const audio = new Audio(vocab.linkAudio);
-    
-    // Xử lý khi phát xong
-    audio.onended = () => {
-      this.isPlayingAudio = null;
-    };
-    
-    // Xử lý lỗi
-    audio.onerror = () => {
-      this.isPlayingAudio = null;
-    };
-    
-    // Phát âm thanh
-    audio.play().catch((error) => {
-      this.isPlayingAudio = null;
-    });
 
-    // Sử dụng Speech Synthesis API để đọc romaji (fallback)
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(vocab.romaji);
+    if (vocab.audioLink) {
+      const audio = new Audio(vocab.audioLink);
+
+      audio.onended = () => {
+        this.isPlayingAudio = null;
+      };
+
+      audio.onerror = () => {
+        this.isPlayingAudio = null;
+        // fallback nếu có jomaji
+        if ('speechSynthesis' in window && vocab.jomaji) {
+          const utterance = new SpeechSynthesisUtterance(vocab.jomaji);
+          utterance.lang = 'ja-JP';
+          utterance.rate = 0.8;
+          speechSynthesis.speak(utterance);
+        }
+      };
+
+      audio.play().catch(() => {
+        this.isPlayingAudio = null;
+      });
+    } else if (vocab.jomaji && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(vocab.jomaji);
       utterance.lang = 'ja-JP';
       utterance.rate = 0.8;
       utterance.onend = () => {
-        if (this.isPlayingAudio === vocab.id) {
-          this.isPlayingAudio = null;
-        }
+        this.isPlayingAudio = null;
       };
-      
-      // Chỉ sử dụng speech synthesis nếu không phát được audio từ server
-      audio.addEventListener('error', () => {
-        speechSynthesis.speak(utterance);
-      });
+      speechSynthesis.speak(utterance);
+    } else {
+      this.isPlayingAudio = null;
     }
+
+    console.log('vocab', vocab);
   }
 
   onPageChange(page: number): void {
@@ -147,5 +149,4 @@ export class VocaDetailComponent implements OnInit {
   trackByVocabId(index: number, vocab: any): number {
     return vocab.id;
   }
-
 }
