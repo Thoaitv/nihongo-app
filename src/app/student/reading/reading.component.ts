@@ -14,6 +14,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { FormsModule } from '@angular/forms';
 import { Observable, BehaviorSubject, debounceTime, distinctUntilChanged, switchMap, startWith, catchError, of } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 interface ReadingItem {
   id: number;
@@ -67,7 +68,6 @@ export class ReadingComponent implements OnInit {
   searchTerm = '';
   sortBy = 'newest';
   
-  private readonly baseUrl = 'http://localhost:9093';
 
   ngOnInit(): void {
     this.setupSearch();
@@ -84,7 +84,7 @@ export class ReadingComponent implements OnInit {
 
   loadReadings(): void {
     this.loading = true;
-    const url = `${this.baseUrl}/readings?limit=${this.pageSize}&page=${this.currentPage}`;
+    const url = `${environment.apiUrl}/readings?limit=${this.pageSize}&page=${this.currentPage}`;
     
     this.http.get<ReadingListResponse>(url).pipe(
       catchError(error => {

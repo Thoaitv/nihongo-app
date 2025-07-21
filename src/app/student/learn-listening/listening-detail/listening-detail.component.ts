@@ -11,7 +11,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { HttpClient } from '@angular/common/http';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-
+import { environment } from '../../../../environments/environment';
 interface QuestionChoice {
   id: number;
   choiceText: string;
@@ -67,7 +67,7 @@ export class ListeningDetailComponent implements OnInit {
   loading = false;
   error: any | null = null;
 
-  private readonly API_BASE_URL = 'http://localhost:9093';
+
 
   constructor(private message: NzMessageService, private http: HttpClient) {}
 
@@ -117,7 +117,7 @@ export class ListeningDetailComponent implements OnInit {
     };
 
     this.http
-      .get<any>(`${this.API_BASE_URL}/listening/${lessonId}/answers`, {
+      .get<any>(`${environment.apiUrl}/listening/${lessonId}/answers`, {
         headers,
       })
       .subscribe({

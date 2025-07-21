@@ -18,6 +18,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzFlexModule } from 'ng-zorro-antd/flex';
+import { environment } from '../../../environments/environment';
 
 interface Exam {
   id: number;
@@ -77,8 +78,6 @@ export class ExamStudentComponent implements OnInit {
   searchTerm = '';
 
   // API URL
-  private baseUrl = 'http://localhost:9093';
-
   ngOnInit(): void {
     this.loadExams();
   }
@@ -92,7 +91,7 @@ export class ExamStudentComponent implements OnInit {
     });
 
     this.http
-      .get<ExamResponse>(`${this.baseUrl}/exams?${params.toString()}`)
+      .get<ExamResponse>(`${environment.apiUrl}/exams?${params.toString()}`)
       .subscribe({
         next: (response: any) => {
           if (response.status && response.data) {

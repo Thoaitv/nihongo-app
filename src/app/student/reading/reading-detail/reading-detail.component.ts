@@ -14,6 +14,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { environment } from '../../../../environments/environment';
 
 interface QuestionChoice {
   id: number;
@@ -65,7 +66,6 @@ export class ReadingDetailComponent implements OnInit {
  readingData: ReadingData | null = null;
   loading = false;
   error: string | null = null;
-  private apiBaseUrl = 'http://localhost:9093';
 
   constructor(
     private route: ActivatedRoute,
@@ -106,7 +106,7 @@ export class ReadingDetailComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    const apiUrl = `${this.apiBaseUrl}/reading/${readingId}/answer`;
+    const apiUrl = `${environment}/reading/${readingId}/answer`;
     
     this.http.get<any>(apiUrl).subscribe({
       next: (response) => {

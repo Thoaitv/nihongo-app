@@ -14,6 +14,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { ActivatedRoute } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 interface QuestionChoice {
   id: number;
@@ -129,7 +130,7 @@ export class ExamDetailComponent implements OnInit {
     this.loading = true;
     this.http
       .get<any>(
-        `http://localhost:9093/exam/${id}/questions?includeAnswers=false`
+        `${environment.apiUrl}/exam/${id}/questions?includeAnswers=false`
       )
       .subscribe({
         next: (response) => {
@@ -299,7 +300,7 @@ export class ExamDetailComponent implements OnInit {
     // API call
     this.http
       .post<any>(
-        `http://localhost:9093/exam/${this.examData.id}/submit`,
+        `${environment.apiUrl}/exam/${this.examData.id}/submit`,
         submitData
       )
       .subscribe({

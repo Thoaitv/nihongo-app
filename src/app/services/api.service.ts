@@ -7,12 +7,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:9093';
-
   constructor(private http: HttpClient) {}
 
   login(data: any) {
-    return this.http.post(`${this.baseUrl}/login`, data);
+    return this.http.post(`${environment.apiUrl}/login`, data);
   }
 
   register(payload: {
@@ -21,12 +19,12 @@ export class ApiService {
     username: string;
     password: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/user/register`, payload);
+    return this.http.post(`${environment.apiUrl}/user/register`, payload);
   }
 
   listTopics(page: number = 1, limit: number = 20) {
     const params = new HttpParams().set('page', page).set('limit', limit);
-    return this.http.get(`${this.baseUrl}/topics`, { params });
+    return this.http.get(`${environment.apiUrl}/topics`, { params });
   }
   createTopic(payload: {
     name: string;
@@ -38,7 +36,7 @@ export class ApiService {
       code: this.generateUUID(),
       description: payload.description,
     };
-    return this.http.post(`${this.baseUrl}/topic`, requestPayload);
+    return this.http.post(`${environment.apiUrl}/topic`, requestPayload);
   }
 
   updateTopic(
@@ -52,11 +50,11 @@ export class ApiService {
       name: payload.name,
       description: payload.description,
     };
-    return this.http.put(`${this.baseUrl}/topic/${id}`, requestPayload);
+    return this.http.put(`${environment.apiUrl}/topic/${id}`, requestPayload);
   }
 
   deleteTopic(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/topic/${id}`);
+    return this.http.delete(`${environment.apiUrl}/topic/${id}`);
   }
 
   generateUUID(): string {
@@ -72,41 +70,41 @@ export class ApiService {
 
   listVocabularies(page: number = 1, limit: number = 20) {
     const params = new HttpParams().set('page', page).set('limit', limit);
-    return this.http.get(`${this.baseUrl}/vocabularies`, { params });
+    return this.http.get(`${environment.apiUrl}/vocabularies`, { params });
   }
 
   createVocabulary(formData: FormData): Observable<any> {
-    return this.http.post(`${this.baseUrl}/vocabulary`, formData);
+    return this.http.post(`${environment.apiUrl}/vocabulary`, formData);
   }
 
   // EXAM
   getExams(limit: number = 10, page: number = 1): Observable<any> {
-    return this.http.get(`${this.baseUrl}/exams?limit=${limit}&page=${page}`);
+    return this.http.get(`${environment.apiUrl}/exams?limit=${limit}&page=${page}`);
   }
 
   createExam(exam: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/exam`, exam);
+    return this.http.post(`${environment.apiUrl}/exam`, exam);
   }
 
   getExamDetail(id: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/exam/${id}/questions`);
+    return this.http.get<any>(`${environment.apiUrl}/exam/${id}/questions`);
   }
 
   updateExam(id: number, exam: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/exam/${id}`, exam);
+    return this.http.put(`${environment.apiUrl}/exam/${id}`, exam);
   }
 
   getUsers(limit: number, page: number): Observable<any> {
     const params = { limit, page };
-    return this.http.get(`${this.baseUrl}/users`, { params });
+    return this.http.get(`${environment.apiUrl}/users`, { params });
   }
 
   getListenings(limit: number = 10, page: number = 1): Observable<any> {
     return this.http.get<any>(
-      `${this.baseUrl}/listenings?limit=${limit}&page=${page}`
+      `${environment.apiUrl}/listenings?limit=${limit}&page=${page}`
     );
   }
    getReadings(limit: number = 10, page: number = 1): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/readings?limit=${limit}&page=${page}`);
+    return this.http.get<any>(`${environment.apiUrl}/readings?limit=${limit}&page=${page}`);
   }
 }

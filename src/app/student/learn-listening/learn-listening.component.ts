@@ -14,6 +14,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 interface ListeningLesson {
   id: number;
@@ -61,7 +62,6 @@ export class LearnListeningComponent implements OnInit {
   totalLessons = 0;
   totalPages = 1;
 
-  private apiUrl = 'http://localhost:9093/listenings';
 
   constructor(private http: HttpClient) {}
 
@@ -76,7 +76,7 @@ export class LearnListeningComponent implements OnInit {
       page: this.currentPage.toString(),
     };
 
-    this.http.get<ApiResponse>(this.apiUrl, { params }).subscribe({
+    this.http.get<ApiResponse>(`${environment.apiUrl}/listenings`, { params }).subscribe({
       next: (response) => {
         if (response.status) {
           this.lessons = response.data.list;

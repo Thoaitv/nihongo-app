@@ -70,7 +70,9 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "proxy.conf.json"
+          "host": "0.0.0.0",
+          "allowedHosts": ["7b5efc1fc6d6.ngrok-free.app"],
+          "disableHostCheck": true
           },
           "configurations": {
             "production": {
