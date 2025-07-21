@@ -79,7 +79,9 @@ export class ApiService {
 
   // EXAM
   getExams(limit: number = 10, page: number = 1): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/exams?limit=${limit}&page=${page}`);
+    return this.http.get(
+      `${environment.apiUrl}/exams?limit=${limit}&page=${page}`
+    );
   }
 
   createExam(exam: any): Observable<any> {
@@ -104,7 +106,13 @@ export class ApiService {
       `${environment.apiUrl}/listenings?limit=${limit}&page=${page}`
     );
   }
-   getReadings(limit: number = 10, page: number = 1): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/readings?limit=${limit}&page=${page}`);
+  getReadings(limit: number = 10, page: number = 1): Observable<any> {
+    return this.http.get<any>(
+      `${environment.apiUrl}/readings?limit=${limit}&page=${page}`
+    );
+  }
+
+  getListVoca(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/filter/topics`);
   }
 }

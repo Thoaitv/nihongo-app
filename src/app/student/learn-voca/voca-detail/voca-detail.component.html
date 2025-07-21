@@ -1,0 +1,110 @@
+<div class="vocabulary-container">
+      <!-- Header Section -->
+      <div class="header-section">
+        <button 
+          nz-button 
+          nzType="default" 
+          nzSize="large"
+          class="back-btn"
+          (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          <span>Quay lại danh sách từ vựng</span>
+        </button>
+        <h1 class="page-title">
+          <i class="fas fa-book-open"></i>
+          Học từ vựng tiếng Nhật
+        </h1>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-container">
+        <nz-spin nzSize="large" nzTip="Đang tải từ vựng..."></nz-spin>
+      </div>
+
+      <!-- Vocabulary Cards -->
+      <div *ngIf="!loading && vocabularyList.length > 0" class="vocabulary-grid">
+        <nz-row [nzGutter]="[16, 16]">
+          <nz-col 
+            *ngFor="let vocab of vocabularyList; trackBy: trackByVocabId" 
+            [nzXs]="24" 
+            [nzSm]="12" 
+            [nzMd]="8" 
+            [nzLg]="6">
+            <nz-card 
+              class="vocab-card"
+              [nzHoverable]="true"
+              [nzActions]="[audioAction]">
+              
+              <!-- Card Content -->
+              <div class="card-content">
+                <!-- Japanese Word -->
+                <div class="japanese-section">
+                  <h2 class="japanese-word">{{ vocab.japaneseWord }}</h2>
+                  <nz-tag nzColor="blue" class="romaji-tag">
+                    {{ vocab.romaji }}
+                  </nz-tag>
+                </div>
+
+                <nz-divider></nz-divider>
+
+                <!-- Description -->
+                <div class="description-section">
+                  <h4 class="section-title">
+                    <i class="fas fa-language"></i>
+                    Nghĩa
+                  </h4>
+                  <p class="description">{{ vocab.description }}</p>
+                </div>
+
+                <!-- Example Sentence -->
+                <div class="example-section" *ngIf="vocab.exampleSentence">
+                  <h4 class="section-title">
+                    <i class="fas fa-quote-right"></i>
+                    Ví dụ
+                  </h4>
+                  <p class="example">{{ vocab.exampleSentence }}</p>
+                </div>
+              </div>
+
+              <!-- Audio Action Template -->
+              <ng-template #audioAction>
+                <button 
+                  class="audio-btn"
+                  [disabled]="isPlayingAudio === vocab.id"
+                  (click)="playAudio(vocab)">
+                  <i 
+                    class="fas"
+                    [class.fa-volume-up]="isPlayingAudio !== vocab.id"
+                    [class.fa-spinner]="isPlayingAudio === vocab.id"
+                    [class.fa-spin]="isPlayingAudio === vocab.id">
+                  </i>
+                  <span>{{ isPlayingAudio === vocab.id ? 'Đang phát...' : 'Phát âm' }}</span>
+                </button>
+              </ng-template>
+            </nz-card>
+          </nz-col>
+        </nz-row>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="!loading && totalPages > 1" class="pagination-container">
+        <!-- <nz-pagination
+          [nzPageIndex]="currentPage"
+          [nzTotal]="totalItems"
+          [nzPageSize]="pageSize"
+          [nzShowSizeChanger]="false"
+          [nzShowQuickJumper]="true"
+          nzShowTotal
+          (nzPageIndexChange)="onPageChange($event)">
+        </nz-pagination> -->
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && vocabularyList.length === 0" class="empty-state">
+        <div class="empty-content">
+          <i class="fas fa-book-open empty-icon"></i>
+          <h3>Chưa có từ vựng nào</h3>
+          <p>Không tìm thấy từ vựng cho chủ đề này.</p>
+        </div>
+      </div>
+    </div>

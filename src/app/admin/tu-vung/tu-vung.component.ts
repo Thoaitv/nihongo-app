@@ -74,7 +74,6 @@ export class TuVungComponent implements OnInit {
   pageSize = 10;
 
   fileToUpload: File | null = null;
-  fileError = false;
 
   private fb = inject(FormBuilder);
   private apiService = inject(ApiService);
@@ -137,7 +136,6 @@ export class TuVungComponent implements OnInit {
     this.modalTitle = 'Thêm từ vựng mới';
     this.vocabForm.reset();
     this.fileToUpload = null;
-    this.fileError = false;
     this.isModalVisible = true;
   }
 
@@ -145,20 +143,17 @@ export class TuVungComponent implements OnInit {
     this.isModalVisible = false;
     this.vocabForm.reset();
     this.fileToUpload = null;
-    this.fileError = false;
   }
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.fileToUpload = input.files[0];
-      this.fileError = false;
     }
   }
 
   handleSubmit(): void {
-    if (this.vocabForm.invalid || !this.fileToUpload) {
-      if (!this.fileToUpload) this.fileError = true;
+    if (this.vocabForm.invalid) {
       this.vocabForm.markAllAsTouched();
       return;
     }

@@ -1,0 +1,282 @@
+.vocabulary-container {
+  padding: 24px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  .header-section {
+    margin-bottom: 32px;
+
+    .back-btn {
+      margin-bottom: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      i {
+        margin-right: 8px;
+        font-size: 14px;
+      }
+
+      span {
+        font-weight: 500;
+      }
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1890ff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      i {
+        font-size: 24px;
+        color: #52c41a;
+      }
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .vocabulary-grid {
+    .vocab-card {
+      height: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: none;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-content {
+        .japanese-section {
+          text-align: center;
+          margin-bottom: 16px;
+
+          .japanese-word {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1890ff;
+            margin: 0 0 12px 0;
+            line-height: 1.2;
+            font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+          }
+
+          .romaji-tag {
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: 500;
+          }
+        }
+
+        .description-section,
+        .example-section {
+          margin-bottom: 16px;
+
+          .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #595959;
+            margin: 0 0 8px 0;
+
+            i {
+              font-size: 12px;
+              color: #1890ff;
+            }
+          }
+
+          .description {
+            font-size: 16px;
+            font-weight: 500;
+            color: #262626;
+            margin: 0;
+            line-height: 1.5;
+          }
+
+          .example {
+            font-size: 14px;
+            color: #595959;
+            font-style: italic;
+            margin: 0;
+            line-height: 1.5;
+            background: #f6f8fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 3px solid #1890ff;
+          }
+        }
+      }
+
+      ::ng-deep .ant-card-actions {
+        background: #fafafa;
+        border-top: 1px solid #f0f0f0;
+
+        .audio-btn {
+          background: none;
+          border: none;
+          width: 100%;
+          padding: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-size: 14px;
+          font-weight: 500;
+          color: #1890ff;
+
+          &:hover:not(:disabled) {
+            background: #e6f7ff;
+            color: #0050b3;
+          }
+
+          &:disabled {
+            color: #bfbfbf;
+            cursor: not-allowed;
+          }
+
+          i {
+            font-size: 16px;
+
+            &.fa-spinner {
+              animation: spin 1s linear infinite;
+            }
+          }
+
+          @keyframes spin {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .pagination-container {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .empty-content {
+      text-align: center;
+      color: #8c8c8c;
+
+      .empty-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        color: #d9d9d9;
+      }
+
+      h3 {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0 0 8px 0;
+        color: #595959;
+      }
+
+      p {
+        font-size: 14px;
+        margin: 0;
+        color: #8c8c8c;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .vocabulary-container {
+    padding: 16px;
+
+    .header-section {
+      margin-bottom: 24px;
+
+      .page-title {
+        font-size: 24px;
+      }
+    }
+
+    .vocabulary-grid {
+      .vocab-card {
+        .card-content {
+          .japanese-section {
+            .japanese-word {
+              font-size: 28px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .vocabulary-container {
+    padding: 12px;
+
+    .header-section {
+      .back-btn {
+        width: 100%;
+        margin-bottom: 12px;
+      }
+
+      .page-title {
+        font-size: 20px;
+        text-align: center;
+      }
+    }
+
+    .vocabulary-grid {
+      .vocab-card {
+        .card-content {
+          .japanese-section {
+            .japanese-word {
+              font-size: 24px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

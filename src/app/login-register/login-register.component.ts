@@ -62,7 +62,7 @@ export class LoginRegisterComponent {
     this.apiService.login({ username, password }).subscribe({
       next: (res: any) => {
         if (res.status) {
-          console.log('username', username);
+          console.log('res', res);
 
           this.toastr.success('Đăng nhập thành công');
           if (username === 'admin') {
@@ -71,6 +71,7 @@ export class LoginRegisterComponent {
             this.router.navigate(['/student/home']);
           }
           localStorage.setItem('role', res?.data.role);
+          localStorage.setItem('id', res?.data.id);
           localStorage.setItem('username', res?.data.username);
         } else {
           this.toastr.error('Đăng nhập thất bại');
